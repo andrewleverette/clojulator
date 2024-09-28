@@ -1,6 +1,23 @@
 (ns calculator-repl.core)
 
+(defn display-welcome-message
+  []
+  (println "================================")
+  (println "Welcome to Calculator REPL")
+  (println "Enter an expression to evaluate")
+  (println "Type 'quit' to exit")
+  (println "================================"))
+
 (defn -main
-  "I don't do a whole lot ... yet."
   [& args]
-  (println "Hello, World!"))
+  (display-welcome-message)
+  (loop []
+    (print "(in)=> ")
+    (flush)
+    (let [input (read-line)]
+      (if (= input "quit")
+        (println "Bye!")
+        (do
+          (println "(out)=>" input)
+          (recur))))))
+
