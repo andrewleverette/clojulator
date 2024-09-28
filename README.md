@@ -22,7 +22,7 @@ A simple calculator application that performs basic arithmetic operations in a R
 	- Division by zero should be handled gracefully with an appropriate error message.
 2. **User Input Handling:**
 	- Collect user input for numbers and an operation (`+`, `-`, `*`, `/`).
-	- Validate input to ensure it's either a valid number, operation symbol.
+	- Validate input to ensure it's either a valid number or operation symbol.
 	- Provide feedback for invalid inputs.
 3. **Calculator Logic:**
 	- Perform the chosen arithmetic operation on the input numbers and display the result.
