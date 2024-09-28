@@ -1,23 +1,24 @@
-(ns calculator-repl.core)
+(ns calculator-repl.core
+  (:gen-class)
+  (:require [calculator-repl.printer :as printer]))
 
 (defn display-welcome-message
   []
-  (println "================================")
-  (println "Welcome to Calculator REPL")
-  (println "Enter an expression to evaluate")
-  (println "Type 'quit' to exit")
-  (println "================================"))
+  (printer/display-line "================================")
+  (printer/display-line "Welcome to Calculator REPL")
+  (printer/display-line "Enter an expression to evaluate")
+  (printer/display-line "Type 'quit' to exit")
+  (printer/display-line "================================"))
 
 (defn -main
-  [& args]
+  []
   (display-welcome-message)
   (loop []
-    (print "(in)=> ")
-    (flush)
+    (printer/display "(in)=> " :with-flush? true)
     (let [input (read-line)]
       (if (= input "quit")
-        (println "Bye!")
+        (printer/display-line "Bye!")
         (do
-          (println "(out)=>" input)
+          (printer/display-line (str "(out)=> " input))
           (recur))))))
 
