@@ -4,6 +4,8 @@
 
 A simple calculator application that performs basic arithmetic operations in a REPL.
 
+This is a work in progress.
+
 ---
 
 ## Objectives

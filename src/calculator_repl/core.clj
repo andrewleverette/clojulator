@@ -97,6 +97,21 @@
       :Times (* x y)
       :Divide (/ x y))))
 
+(defn try-evaluate
+  [exp]
+  (try
+    (let [parsed (-> exp tokenize parse)
+          result (evaluate parsed)]
+      {:ok result})
+    (catch Exception e
+      {:error (.getMessage e)})))
+
+(defn display-result
+  [result]
+  (if (:ok result)
+    (printer/display-line (str "(out)=> " (expression->str (:ok result))))
+    (printer/display-line (str "(error)=> " (:error result)))))
+
 (defn -main
   []
   (display-welcome-message)
@@ -105,11 +120,6 @@
       (if (should-quit? input)
         (printer/display-line "Bye!")
         (do
-          (try
-            (let [parsed (-> input tokenize parse)
-                  result (evaluate parsed)]
-              (printer/display-line (str "(out)=> " (expression->str parsed) " = " result)))
-            (catch Exception e
-              (printer/display-line (str "(error)=> " (.getMessage e)))))
+          (-> input try-evaluate display-result)
           (recur))))))
 
