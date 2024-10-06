@@ -2,7 +2,8 @@
   (:gen-class)
   (:require
    [clojure.string :as str]
-   [calculator-repl.printer :as printer]))
+   [calculator-repl.printer :as printer]
+   [calculator-repl.reader.core :as rdr]))
 
 (defn display-welcome-message
   []
@@ -54,7 +55,7 @@
 
 (defn should-quit?
   [s]
-  (= s "quit"))
+  (= s :quit))
 
 (defn tokenize [input]
   (loop [terms (-> input (str/split #"(?<=[-+*/])|(?=[-+*/])") seq)
@@ -116,7 +117,7 @@
   []
   (display-welcome-message)
   (loop []
-    (let [input (read-expression)]
+    (let [input (rdr/read-expression)]
       (if (should-quit? input)
         (printer/display-line "Bye!")
         (do
