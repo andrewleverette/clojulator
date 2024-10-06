@@ -1,0 +1,56 @@
+(def symbol-tokens {\( :OpenParen
+                    \) :CloseParen
+                    \+  :Plus
+                    \-  :Minus
+                    \*  :Star
+                    \/  :Slash})
+
+(defn is-symbol? [c] (symbol-tokens c))
+
+(defn is-digit?
+  [c]
+  (when (not= nil c)
+    (Character/isDigit c)))
+
+(defn is-whitespace? [c] (Character/isWhitespace c))
+
+(defn ignore-whitespace
+  [chars]
+  (drop-while is-whitespace? chars))
+
+(defn symbol-token
+  [lexeme pos]
+  (when-let [type (symbol-tokens lexeme)]
+    {:type type :lexeme (str lexeme) :pos pos :len 1}))
+
+(defn nubmer-token
+  [chars pos]
+  (let [lexeme (apply str (take-while is-digit? chars))
+        literal (parse-long lexeme)]
+    {:type :Number :lexeme lexeme :pos pos :len (count lexeme) :literal literal}))
+
+(defn scan-token
+  [characters index]
+  (when (seq characters)
+    (let [trimmed (ignore-whitespace characters)
+          offset (- (count characters) (count trimmed))
+          pos (+ index offset)]
+      (when-let [c (first trimmed)]
+        (cond
+          (is-symbol? c) (symbol-token c pos)
+          (is-digit? c) (nubmer-token trimmed pos)
+          :else (throw (Exception. (str "Unknown character: '" c "'"))))))))
+
+(defn tokenize
+  [source]
+  (loop [chars (seq source)
+         index 0
+         tokens []]
+    (if-let [token (scan-token chars index)]
+      (let [delta (- (+ (:pos token) (:len token)) index)]
+        (recur
+         (drop delta chars)
+         (+ index delta (:len token))
+         (conj tokens token)))
+      tokens)))
+
