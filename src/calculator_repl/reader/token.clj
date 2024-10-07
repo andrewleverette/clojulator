@@ -18,13 +18,29 @@
 
 (defn number->token
   [n pos]
-  (token :Number (str n) pos (count (str n)) n))
+  (token :Number (str n) pos (count (str n)) (parse-double n)))
 
 (defn symbol->token
   [s pos]
   (when-let [token-type (symbol-tokens s)]
     (token token-type (str s) pos 1)))
 
-(defn token->str
+(defn token-type
+  [token]
+  (:type token))
+
+(defn lexeme
   [token]
   (:lexeme token))
+
+(defn literal
+  [token]
+  (:literal token))
+
+(defn pos
+  [token]
+  (:pos token))
+
+(defn length
+  [token]
+  (:len token))

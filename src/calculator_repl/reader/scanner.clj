@@ -14,10 +14,9 @@
   [chars]
   (drop-while is-whitespace? chars))
 
-(defn parse-number
+(defn number-lexeme
   [chars]
-  (let [lexeme (apply str (take-while is-digit? chars))]
-    (parse-long lexeme)))
+  (apply str (take-while is-digit? chars)))
 
 (defn scan-token
   [characters index]
@@ -28,8 +27,8 @@
       (when-let [c (first trimmed)]
         (cond
           (is-symbol? c) (tok/symbol->token c pos)
-          (is-digit? c) (-> trimmed parse-number (tok/number->token pos))
-          :else (throw (Exception. (str "Unknown character: '" c "'"))))))))
+          (is-digit? c) (-> trimmed number-lexeme (tok/number->token pos))
+          :else (throw (Exception. (str "Unknown character: '" c "' at position " pos))))))))
 
 (defn tokenize
   [source]
@@ -37,11 +36,9 @@
          index 0
          tokens []]
     (if-let [token (scan-token chars index)]
-      (let [delta (- (+ (:pos token) (:len token)) index)]
+      (let [delta (- (+ (tok/pos token) (tok/length token)) index)]
         (recur
          (drop delta chars)
          (+ index delta)
          (conj tokens token)))
       tokens)))
-
-(tokenize "(1+2)-3")
