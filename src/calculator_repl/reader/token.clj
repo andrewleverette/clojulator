@@ -8,6 +8,7 @@
                     \/  :Slash})
 
 (defn token
+  "Token constructor"
   ([type lexeme pos len] (token type lexeme pos len nil))
   ([type lexeme pos len literal]
    {:type type
@@ -17,10 +18,12 @@
     :len len}))
 
 (defn number->token
+  "Given a number and a position, return a token"
   [n pos]
   (token :Number (str n) pos (count (str n)) (parse-double n)))
 
 (defn symbol->token
+  "Given a symbol and a position, return a token"
   [s pos]
   (when-let [token-type (symbol-tokens s)]
     (token token-type (str s) pos 1)))

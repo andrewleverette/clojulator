@@ -19,6 +19,7 @@
   (apply str (take-while is-digit? chars)))
 
 (defn scan-token
+  "Scans for the next token in the source string ignoring whitespace."
   [characters index]
   (when (seq characters)
     (let [trimmed (ignore-whitespace characters)
@@ -31,6 +32,7 @@
           :else (throw (Exception. (str "Unknown character: '" c "' at position " pos))))))))
 
 (defn tokenize
+  "Given a string, returns a list of tokens."
   [source]
   (loop [chars (seq source)
          index 0

@@ -1,11 +1,9 @@
 (ns calculator-repl.reader.core
-  (:require [calculator-repl.printer :as printer]))
+  (:require [calculator-repl.reader.parser :refer [parse]]
+            [calculator-repl.reader.scanner :refer [tokenize]]))
 
 (defn read-expression
-  []
-  (printer/display "(in)=> " :with-flush? true)
-  (let [input (read-line)]
-    (if (= input "quit")
-      :quit
-      input)))
+  "Given an input string, attempts to tokenize and parse it into an AST"
+  [input]
+  (-> input tokenize parse))
 
