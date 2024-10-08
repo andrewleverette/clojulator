@@ -19,27 +19,27 @@
 
 (deftest multiplicative-tests
   (testing "multiplying two numbers should return a multiplication node"
-    (is (= [:Star [:Number 1.0] [:Number 2.0]] (parse (tokenize "1*2")))))
+    (is (= [:Star [:Number 1.0] [:Number 2.0]] (parse (tokenize "1 * 2")))))
   (testing "dividing two numbers should return a division node"
-    (is (= [:Slash [:Number 1.0] [:Number 2.0]] (parse (tokenize "1/2")))))
+    (is (= [:Slash [:Number 1.0] [:Number 2.0]] (parse (tokenize "1 / 2")))))
   (testing "compound multiplicative expressions should return left-associative nested nodes"
     (is (= [:Star
             [:Slash
              [:Number 1.0]
              [:Number 2.0]]
-            [:Number 2.0]] (-> "1/2*2" tokenize parse)))))
+            [:Number 2.0]] (-> "1 / 2 * 2" tokenize parse)))))
 
 (deftest additive-tests
   (testing "adding two numbers should return a addition node"
-    (is (= [:Plus [:Number 1.0] [:Number 2.0]] (parse (tokenize "1+2")))))
+    (is (= [:Plus [:Number 1.0] [:Number 2.0]] (parse (tokenize "1 + 2")))))
   (testing "subtracting two numbers should return a subtraction node"
-    (is (= [:Minus [:Number 1.0] [:Number 2.0]] (parse (tokenize "1-2")))))
+    (is (= [:Minus [:Number 1.0] [:Number 2.0]] (parse (tokenize "1 - 2")))))
   (testing "compound additive expressions should return left-associative nested nodes"
     (is (= [:Plus
             [:Minus
              [:Number 1.0]
              [:Number 2.0]]
-            [:Number 2.0]] (-> "1-2+2" tokenize parse)))))
+            [:Number 2.0]] (-> "1 - 2 + 2" tokenize parse)))))
 
 (deftest compound-expressions
   (testing "multiplicative expressions have higher precedence than additive expressions"
@@ -47,17 +47,17 @@
             [:Number 1.0]
             [:Star
              [:Number 2.0]
-             [:Number 3.0]]] (-> "1+2*3" tokenize parse)))
+             [:Number 3.0]]] (-> "1 + 2 * 3" tokenize parse)))
     (is (= [:Minus
             [:Star
              [:Number 1.0]
              [:Number 2.0]]
-            [:Number 3.0]] (-> "1*2-3" tokenize parse))))
+            [:Number 3.0]] (-> "1 * 2 - 3" tokenize parse))))
   (testing "grouped expressions have higher precedence than multiplicative expressions"
     (is (= [:Star
             [:Group
              [:Plus
               [:Number 1.0]
               [:Number 1.0]]]
-            [:Number 2.0]] (-> "(1+1)*2" tokenize parse)))))
+            [:Number 2.0]] (-> "(1 + 1) * 2" tokenize parse)))))
 

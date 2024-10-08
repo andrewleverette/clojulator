@@ -6,7 +6,9 @@
   (testing "evaluating a number should return the number"
     (is (= 1.0 (evaluate [:Number 1.0])))
     (is (= 10.0 (evaluate [:Number 10.0])))
-    (is (= 1234567890.0 (evaluate [:Number 1234567890.0])))))
+    (is (= 1234567890.0 (evaluate [:Number 1234567890.0]))))
+  (testing "evaluating a number that is nil should return nil"
+    (is (= nil (evaluate [:Number nil])))))
 
 (deftest unary-minus-tests
   (testing "evaluating a unary minus should return the negated number"

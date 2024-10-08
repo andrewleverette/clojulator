@@ -32,14 +32,15 @@
 
 (defn- number
   "Number rule: <number>
-  Adds a number literal to the AST if the next token matches :Number."
+  Adds a number literal to the AST if the next token matches 
+  :Number or :Repl/*1, :Repl/*2, or :Repl/*3."
   [tokens]
-  (if (match tokens #{:Number})
-    {:remaining (rest tokens) :node [:Number (tok/literal (first tokens))]}
+  (if (match tokens #{:Number :Repl/*1 :Repl/*2 :Repl/*3})
+    {:node [:Number (tok/literal (first tokens))] :remaining (rest tokens)}
     (parser-error tokens)))
 
 (defn- primary
-  "Primary rule: <number> | <expression>
+  "Primary rule: <number> | <group>
   Matches either a number literal or a group node to the AST"
   [tokens]
   (if (match tokens #{:OpenParen})
