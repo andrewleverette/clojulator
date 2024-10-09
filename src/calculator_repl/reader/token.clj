@@ -1,5 +1,4 @@
-(ns calculator-repl.reader.token
-  (:require [calculator-repl.history :as history]))
+(ns calculator-repl.reader.token)
 
 (def symbol-tokens {\( :OpenParen
                     \) :CloseParen
@@ -7,9 +6,9 @@
                     \-  :Minus
                     \*  :Star
                     \/  :Slash
-                    "*1" :Repl/*1
-                    "*2" :Repl/*2
-                    "*3" :Repl/*3})
+                    "p1" :Repl/*1
+                    "p2" :Repl/*2
+                    "p3" :Repl/*3})
 
 (defn token
   "Token constructor"
@@ -33,16 +32,6 @@
   (when-let [token-type (symbol-tokens s)]
     (let [lexeme (str s)]
       (token token-type lexeme pos (count lexeme)))))
-
-(defn repl-symbol->token
-  [s pos]
-  (when-let [token-type (symbol-tokens s)]
-    (let [literal (case token-type
-                    :Repl/*1 (history/repl1)
-                    :Repl/*2 (history/repl2)
-                    :Repl/*3 (history/repl3)
-                    nil)]
-      (token token-type s pos (count s) literal))))
 
 (defn token-type
   [token]

@@ -20,10 +20,10 @@
   (= s "quit"))
 
 (defn calculate
-  [input]
+  [input history]
   (try
-    (let [result (-> input read-expression evaluate)]
-      (update-history result)
+    (let [result (-> input read-expression (evaluate history))]
+      (update-history history result)
       (printer/display-line (str "(out)=> " result)))
     (catch Exception e
       (printer/display-line (str "(error)=> " (.getMessage e))))))
@@ -31,13 +31,14 @@
 (defn -main
   []
   (display-welcome-message)
-  (loop []
-    (printer/display "(in)=> " :with-flush? true)
-    (let [input (read-line)]
-      (if (should-quit? input)
-        (do
-          (clear-history)
-          (printer/display-line "Bye!"))
-        (do
-          (calculate input)
-          (recur))))))
+  (let [history (atom [])]
+    (loop []
+      (printer/display "(in)=> " :with-flush? true)
+      (let [input (read-line)]
+        (if (should-quit? input)
+          (do
+            (clear-history history)
+            (printer/display-line "Bye!"))
+          (do
+            (calculate input history)
+            (recur)))))))

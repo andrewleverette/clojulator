@@ -30,6 +30,15 @@
         {:node [:Group (:node expr)] :remaining (rest remaining-tokens)}
         (parser-error (:remaining expr))))))
 
+(defn- env
+  "Environment variable rule: p1 | p2 | p3
+  Adds an environment variable node to the AST if the next token matches
+  :Repl/*1, :Repl/*2, or :Repl/*3."
+  [tokens]
+  (if (match tokens #{:Repl/*1 :Repl/*2 :Repl/*3})
+    {:node [:Env (tok/lexeme (first tokens))] :remaining (rest tokens)}
+    (parser-error tokens)))
+
 (defn- number
   "Number rule: <number>
   Adds a number literal to the AST if the next token matches 
@@ -40,12 +49,13 @@
     (parser-error tokens)))
 
 (defn- primary
-  "Primary rule: <number> | <group>
-  Matches either a number literal or a group node to the AST"
+  "Primary rule: <group> | <env> | <number>
+  Matches either a number literal, a group node, or an environment variable."
   [tokens]
-  (if (match tokens #{:OpenParen})
-    (group tokens)
-    (number tokens)))
+  (cond
+    (match tokens #{:OpenParen}) (group tokens)
+    (match tokens #{:Repl/*1 :Repl/*2 :Repl/*3}) (env tokens)
+    :else (number tokens)))
 
 (defn- unary
   "Unary rule: - <unary> | <primary>

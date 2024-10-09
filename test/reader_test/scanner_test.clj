@@ -1,6 +1,6 @@
 (ns reader-test.scanner-test
   (:require [clojure.test :refer [deftest is testing]]
-            [calculator-repl.reader.token :refer [number->token repl-symbol->token symbol->token]]
+            [calculator-repl.reader.token :refer [number->token symbol->token]]
             [calculator-repl.reader.scanner :refer [tokenize]]))
 
 (defn generate-number-tokens
@@ -55,11 +55,11 @@
 
 (deftest repl-symbol-tests
   (testing "individual repl symbols should return a valid single token"
-    (is (= [(repl-symbol->token "*1" 0)] (tokenize "*1")))
-    (is (= [(repl-symbol->token "*2" 0)] (tokenize "*2")))
-    (is (= [(repl-symbol->token "*3" 0)] (tokenize "*3"))))
+    (is (= [(symbol->token "p1" 0)] (tokenize "p1")))
+    (is (= [(symbol->token "p2" 0)] (tokenize "p2")))
+    (is (= [(symbol->token "p3" 0)] (tokenize "p3"))))
   (testing "repl symbols in simple expressions should return valid tokens"
-    (is (= [(repl-symbol->token "*1" 0) (symbol->token \+ 3) (number->token "2" 5)] (tokenize "*1 + 2")))
-    (is (= [(number->token "2" 0) (symbol->token \- 2) (repl-symbol->token "*2" 4)] (tokenize "2 - *2")))
-    (is (= [(number->token "2" 0) (symbol->token \* 2) (repl-symbol->token "*3" 4)] (tokenize "2 * *3")))
-    (is (= [(repl-symbol->token "*1" 0) (symbol->token \/ 3) (number->token "2" 5)] (tokenize "*1 / 2")))))
+    (is (= [(symbol->token "p1" 0) (symbol->token \+ 3) (number->token "2" 5)] (tokenize "p1 + 2")))
+    (is (= [(number->token "2" 0) (symbol->token \- 2) (symbol->token "p2" 4)] (tokenize "2 - p2")))
+    (is (= [(number->token "2" 0) (symbol->token \* 2) (symbol->token "p3" 4)] (tokenize "2 * p3")))
+    (is (= [(symbol->token "p1" 0) (symbol->token \/ 3) (number->token "2" 5)] (tokenize "p1 / 2")))))

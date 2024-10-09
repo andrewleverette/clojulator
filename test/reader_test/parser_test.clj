@@ -17,6 +17,12 @@
   (testing "a minus minus should return a minus minus number node"
     (is (= [:Minus [:Minus [:Number 1.0]]] (parse (tokenize "--1"))))))
 
+(deftest environment-variable-tests
+  (testing "valid environment variables should return a single node in AST"
+    (is (= [:Env "p1"] (parse (tokenize "p1"))))
+    (is (= [:Env "p2"] (parse (tokenize "p2"))))
+    (is (= [:Env "p3"] (parse (tokenize "p3"))))))
+
 (deftest multiplicative-tests
   (testing "multiplying two numbers should return a multiplication node"
     (is (= [:Star [:Number 1.0] [:Number 2.0]] (parse (tokenize "1 * 2")))))

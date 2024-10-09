@@ -40,7 +40,7 @@
           pos (+ index offset)]
       (when-let [c (first trimmed)]
         (cond
-          (is-repl-symbol? trimmed) (-> trimmed repl-lexeme (tok/repl-symbol->token pos))
+          (is-repl-symbol? trimmed) (-> trimmed repl-lexeme (tok/symbol->token pos))
           (is-symbol? c) (tok/symbol->token c pos)
           (is-digit? c) (-> trimmed number-lexeme (tok/number->token pos))
           :else (throw (Exception. (str "Unknown character: '" c "' at position " pos))))))))
