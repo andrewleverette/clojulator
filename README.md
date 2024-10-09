@@ -14,7 +14,7 @@ this applicattion is not intended to be a complete, fully functional calculator.
 It is intended to be used as a tool for me to practice building practical applications in Clojure.
 I would appreciate any custructive feedback. If you have any suggestions or feedback, please feel free to open an issue.
 
-This project is still a work in progress and I will continure to improve it.
+This project is still a work in progress and I will continue to improve it.
 
 ---
 
