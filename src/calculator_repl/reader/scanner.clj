@@ -22,9 +22,23 @@
   [chars]
   (drop-while is-whitespace? chars))
 
-(defn number-lexeme
+(defn integer-lexeme
   [chars]
   (apply str (take-while is-digit? chars)))
+
+(defn fractional-lexeme
+  [chars]
+  (when (= \. (first chars))
+    (integer-lexeme (rest chars))))
+
+(defn number-lexeme
+  [chars]
+  (let [int-part (integer-lexeme chars)
+        int-length (count int-part)
+        fractional-part (->> chars (drop int-length) fractional-lexeme)]
+    (if (empty? fractional-part)
+      int-part
+      (str int-part "." fractional-part))))
 
 (defn repl-lexeme
   [chars]

@@ -7,7 +7,7 @@
   ([end] (generate-number-tokens 0 end))
   ([start end] (->> (range start end) (map (fn [n] [[(number->token (str n) 0)] (tokenize (str n))])))))
 
-(deftest simple-numeric-expressions
+(deftest simple-numeric-expressionk
   (testing "single digit numbers should return valid tokens"
     (let [results (generate-number-tokens 10)]
       (is (every? (fn [[a b]] (= a b)) results))))
@@ -15,7 +15,11 @@
     (let [results (generate-number-tokens 10 20)]
       (is (every? (fn [[a b]] (= a b)) results))))
   (testing "largest supported number should return valid tokens"
-    (is (= [(number->token "9223372036854775807" 0)] (tokenize "9223372036854775807")))))
+    (is (= [(number->token "9223372036854775807" 0)] (tokenize "9223372036854775807"))))
+  (testing "fractional numbers should return valid tokens"
+    (is (= [(number->token "1.0" 0)] (tokenize "1.0")))
+    (is (= [(number->token "2.25" 0)] (tokenize "2.25")))
+    (is (= [(number->token "0.125" 0)] (tokenize "0.125")))))
 
 (deftest supported-symbol-tests
   (testing "All supported symbols"
