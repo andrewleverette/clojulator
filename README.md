@@ -4,7 +4,17 @@
 
 A simple calculator application that performs basic arithmetic operations in a REPL.
 
-This is a work in progress.
+This calculator supports basic arithmetic operations (`+`, `-`, `*`, `/`) and combinations of these operations
+using parentheses (`(1 + 2) * 3`) to change the order of operations, otherwise the default precdence is used. 
+The application also supports history tracking for the last 3 expressions. These values can be referenced
+using (`p1`, `p2`, `p3`) in an expression.
+
+This project is an artifact of my Clojure learning journey. As a learning project, 
+this applicattion is not intended to be a complete, fully functional calculator.
+It is intended to be used as a tool for me to practice building practical applications in Clojure.
+I would appreciate any custructive feedback. If you have any suggestions or feedback, please feel free to open an issue.
+
+This project is still a work in progress and I will continure to improve it.
 
 ---
 
@@ -61,3 +71,27 @@ This is a work in progress.
    - Test the continuous operation of the calculator by simulating various inputs, including numbers, operations, and stop commands.
 3. **Edge Case Handling:**
    - Ensure the program handles invalid inputs, malformed expressions, and invalid commands appropriately, with clear error messages.
+
+---
+
+## Future Work
+
+1. Expand the functionality of the calculator to support more advanced arithmetic operations and expression parsing.
+2. Add support for optionally reading user input from a file or other source.
+3. Add better logging and error reporting.
+
+---
+
+## References
+
+1. [Crafting Interpreters](https://craftinginterpreters.com/contents.html)
+2. [Clojure Docs](https://clojuredocs.org/)
+3. [Clojure Defmulti and Defmethod](https://128bit.io/posts/clojure-defmulti-and-defmethod/)
+
+
+---
+
+## Special Thanks
+
+A special thanks to the memebers of the [Clojure Camp](https://clojure.camp/) community.
+They do amazing work for the Clojure community and their feedback has been greatly appreciated.

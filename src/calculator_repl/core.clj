@@ -12,6 +12,7 @@
   (printer/display-line "Welcome to Calculator REPL")
   (printer/display-line "Enter an arithmetic expression to evaluate")
   (printer/display-line "Currently supported operators: + - * /")
+  (printer/display-line "History trakcing is available via 'p1', 'p2', 'p3'")
   (printer/display-line "Type 'quit' to exit")
   (printer/display-line "================================================"))
 
