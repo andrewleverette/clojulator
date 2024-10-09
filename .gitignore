@@ -1,3 +1,6 @@
 .clj-kondo
 .cpache
 .lsp
+.calva
+output.calva-repl
+codealike.json
