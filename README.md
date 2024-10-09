@@ -76,7 +76,8 @@ This project is still a work in progress and I will continure to improve it.
 
 ## Future Work
 
-1. Expand the functionality of the calculator to support more advanced arithmetic operations and expression parsing.
+1. Add support for fractional numbers.
+2. Expand the functionality of the calculator to support more advanced arithmetic operations and expression parsing.
 2. Add support for optionally reading user input from a file or other source.
 3. Add better logging and error reporting.
 
@@ -85,6 +86,7 @@ This project is still a work in progress and I will continure to improve it.
 ## References
 
 1. [Crafting Interpreters](https://craftinginterpreters.com/contents.html)
+    - Specifically chapters 4 - 7
 2. [Clojure Docs](https://clojuredocs.org/)
 3. [Clojure Defmulti and Defmethod](https://128bit.io/posts/clojure-defmulti-and-defmethod/)
 
