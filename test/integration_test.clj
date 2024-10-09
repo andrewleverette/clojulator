@@ -43,3 +43,14 @@
     (is (= 8.0 (:ok (calculate "p1 * p2" history))))
     (is (= 16.0 (:ok (calculate "p1 * p3" history))))
     (is (= 20.0 (:ok (calculate "(p1 / p3) + (p2 / 2) * p3" history))))))
+
+(deftest expressions-that-should-fail-during-scanning
+  (testing "unkown characters should fail during scanning"
+    (is (= "Unknown character: 'a' at position 8" (:error (calculate "1 + 1 * a" history))))
+    (is (= "Unknown character: 'p' at position 0" (:error (calculate "p" history))))))
+
+(deftest expressions-that-should-fail-durring-parsing
+  (testing "syntax errors should fail during parsing"
+    (is (= "Unexpected end of input" (:error (calculate "1 +" history))))
+    (is (= "Unexpected token '*' at position 0" (:error (calculate "* 1" history))))
+    (is (= "Unexpected token ')' at position 0" (:error (calculate ")(1 + 1)" history))))))
