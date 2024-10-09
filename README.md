@@ -5,7 +5,7 @@
 A simple calculator application that performs basic arithmetic operations in a REPL.
 
 This calculator supports basic arithmetic operations (`+`, `-`, `*`, `/`) and combinations of these operations
-using parentheses (`(1 + 2) * 3`) to change the order of operations, otherwise the default precdence is used. 
+using parentheses (`(1 + 2) * 3`) to change the order of operations, otherwise the default precedence is used. 
 The application also supports history tracking for the last 3 expressions. These values can be referenced
 using (`p1`, `p2`, `p3`) in an expression.
 
