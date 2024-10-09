@@ -89,8 +89,9 @@ This project is still a work in progress and I will continue to improve it.
 
 1. Add support for fractional numbers.
 2. Expand the functionality of the calculator to support more advanced arithmetic operations and expression parsing.
-2. Add support for optionally reading user input from a file or other source.
-3. Add better logging and error reporting.
+3. Add support for optionally reading user input from a file or other source.
+4. Add better logging and error reporting.
+5. Add better handling for exiting the application.
 
 ---
 

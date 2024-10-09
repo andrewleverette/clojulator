@@ -25,9 +25,9 @@
   (try
     (let [result (-> input read-expression (evaluate history))]
       (update-history history result)
-      (printer/display-line (str "(out)=> " result)))
+      {:ok result})
     (catch Exception e
-      (printer/display-line (str "(error)=> " (.getMessage e))))))
+      {:error (.getMessage e)})))
 
 (defn -main
   []
@@ -40,6 +40,8 @@
           (do
             (clear-history history)
             (printer/display-line "Bye!"))
-          (do
-            (calculate input history)
+          (let [{:keys [ok error]} (calculate input history)]
+            (if ok
+              (printer/display-line (str "(out)=> " ok))
+              (printer/display-line (str "(err)=> " error)))
             (recur)))))))
