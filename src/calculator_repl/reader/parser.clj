@@ -41,10 +41,9 @@
 
 (defn- number
   "Number rule: <number>
-  Adds a number literal to the AST if the next token matches 
-  :Number or :Repl/*1, :Repl/*2, or :Repl/*3."
+  Adds a number literal to the AST if the next token matches :Number"
   [tokens]
-  (if (match tokens #{:Number :Repl/*1 :Repl/*2 :Repl/*3})
+  (if (match tokens #{:Number})
     {:node [:Number (tok/literal (first tokens))] :remaining (rest tokens)}
     (parser-error tokens)))
 
