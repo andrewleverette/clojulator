@@ -87,10 +87,10 @@
   (binary-expression tokens unary #{:Caret}))
 
 (defn- factor
-  "Factor rule: <unary> ( [* /] <unary> )*
+  "Factor rule: <exponent> ( [* / %] <exponent> )*
   Adds a factor node to the AST if the next token matches :Star or :Slash."
   [tokens]
-  (binary-expression tokens exponent #{:Star :Slash}))
+  (binary-expression tokens exponent #{:Star :Slash :Modulo}))
 
 (defn- term
   "Term rule: <factor> ( [+ -] <factor> )*

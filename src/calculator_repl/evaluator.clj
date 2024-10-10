@@ -29,6 +29,8 @@
 
 (defmethod evaluate :Slash [node history] (map-eval-reduce history / (rest node)))
 
+(defmethod evaluate :Modulo [node history] (map-eval-reduce history mod (rest node)))
+
 (defmethod evaluate :Plus [node history] (map-eval-reduce history + (rest node)))
 
 (defmethod evaluate :Minus [node history]

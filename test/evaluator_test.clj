@@ -37,14 +37,24 @@
   (testing "dividing two numbers should return the quotient"
     (is (= 0.5 (evaluate [:Slash [:Number 1.0] [:Number 2.0]] history)))
     (testing "dividing by zero should throw an exception"
-      (is (thrown? ArithmeticException (evaluate [:Slash [:Number 1.0] [:Number 0.0]] history))))))
+      (is (thrown? ArithmeticException (evaluate [:Slash [:Number 1.0] [:Number 0.0]] history)))))
+  (testing "raising a number to a power should return the result"
+    (is (= 8.0 (evaluate [:Caret [:Number 2.0] [:Number 3.0]] history))))
+  (testing "taking the remainder of two numbers should return the remainder"
+    (is (= 1.0 (evaluate [:Modulo [:Number 5.0] [:Number 2.0]] history)))
+    (is (= 0.0 (evaluate [:Modulo [:Number 3.0] [:Number 3.0]] history)))))
 
 (deftest precedence-tests
   (testing "multiplicative expressions have higher precedence than additive expressions"
     ;; 1 + 2 * 3
     (is (= 7.0 (evaluate [:Plus [:Number 1.0] [:Star [:Number 2.0] [:Number 3.0]]] history)))
     ;; 2 * 3 - 5
-    (is (= 1.0 (evaluate [:Minus [:Star [:Number 2.0] [:Number 3.0]] [:Number 5.0]] history))))
+    (is (= 1.0 (evaluate [:Minus [:Star [:Number 2.0] [:Number 3.0]] [:Number 5.0]] history)))
+    ;; 1 + 4 % 2
+    (is (= 1.0 (evaluate [:Plus [:Number 1.0] [:Modulo [:Number 4.0] [:Number 2.0]]] history))))
+  (testing "exponentiation has higher precedence than multiplicative expressions"
+    ;; 2 * 2 ^ 3
+    (is (= 16.0 (evaluate [:Star [:Number 2.0] [:Caret [:Number 2.0] [:Number 3.0]]] history))))
   (testing "unary minus has higher precedence than multiplicative expressions"
     ;; -2 * 1
     (is (= -2.0 (evaluate [:Star [:Minus [:Number 2.0]] [:Number 1.0]] history)))
@@ -66,7 +76,10 @@
     ;; 1 / 2 * 2
     (is (= 1.0 (evaluate [:Star [:Slash [:Number 1.0] [:Number 2.0]] [:Number 2.0]] history)))
     ;; 4 * 3 / 2
-    (is (= 6.0 (evaluate [:Slash [:Star [:Number 4] [:Number 3]] [:Number 2.0]] history))))
+    (is (= 6.0 (evaluate [:Slash [:Star [:Number 4] [:Number 3]] [:Number 2.0]] history)))
+    ;; 5 % 2 * 2
+    (is (= 2.0 (evaluate [:Star [:Modulo [:Number 5.0] [:Number 2.0]] [:Number 2.0]] history))))
+
   (testing "unary minus is right associative"
     (is (= -1.0 (evaluate [:Minus [:Number 1.0]] history)))
     (is (= -6.0 (evaluate [:Minus [:Group [:Star [:Number 2.0] [:Number 3.0]]]] history)))))

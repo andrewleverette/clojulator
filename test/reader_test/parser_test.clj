@@ -32,12 +32,16 @@
     (is (= [:Star [:Number 1.0] [:Number 2.0]] (parse (tokenize "1 * 2")))))
   (testing "dividing two numbers should return a division node"
     (is (= [:Slash [:Number 1.0] [:Number 2.0]] (parse (tokenize "1 / 2")))))
+  (testing "taking the remainder of two numbers should return a modulo node"
+    (is (= [:Modulo [:Number 1.0] [:Number 2.0]] (parse (tokenize "1 % 2")))))
   (testing "compound multiplicative expressions should return left-associative nested nodes"
-    (is (= [:Star
-            [:Slash
-             [:Number 1.0]
+    (is (= [:Modulo
+            [:Star
+             [:Slash
+              [:Number 1.0]
+              [:Number 2.0]]
              [:Number 2.0]]
-            [:Number 2.0]] (-> "1 / 2 * 2" tokenize parse)))))
+            [:Number 2.0]] (-> "1 / 2 * 2 % 2" tokenize parse)))))
 
 (deftest additive-tests
   (testing "adding two numbers should return a addition node"
@@ -52,12 +56,6 @@
             [:Number 2.0]] (-> "1 - 2 + 2" tokenize parse)))))
 
 (deftest compound-expressions
-  (testing "exponentiation has higher precedence than multiplicative expressions"
-    (is (= [:Star
-            [:Number 2.0]
-            [:Caret
-             [:Number 2.0]
-             [:Number 3.0]]] (-> "2 * 2 ^ 3" tokenize parse))))
   (testing "multiplicative expressions have higher precedence than additive expressions"
     (is (= [:Plus
             [:Number 1.0]
@@ -68,7 +66,18 @@
             [:Star
              [:Number 1.0]
              [:Number 2.0]]
-            [:Number 3.0]] (-> "1 * 2 - 3" tokenize parse))))
+            [:Number 3.0]] (-> "1 * 2 - 3" tokenize parse)))
+    (is (= [:Minus
+            [:Modulo
+             [:Number 1.0]
+             [:Number 2.0]]
+            [:Number 3.0]] (-> "1 % 2 - 3" tokenize parse))))
+  (testing "exponentiation has higher precedence than multiplicative expressions"
+    (is (= [:Star
+            [:Number 2.0]
+            [:Caret
+             [:Number 2.0]
+             [:Number 3.0]]] (-> "2 * 2 ^ 3" tokenize parse))))
   (testing "grouped expressions have higher precedence than multiplicative expressions"
     (is (= [:Star
             [:Group

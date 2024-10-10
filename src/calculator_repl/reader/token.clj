@@ -7,6 +7,7 @@
                     \*   :Star
                     \/   :Slash
                     \^   :Caret
+                    \%   :Modulo
                     "p1" :Repl/*1
                     "p2" :Repl/*2
                     "p3" :Repl/*3})

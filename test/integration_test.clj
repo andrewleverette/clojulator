@@ -17,7 +17,9 @@
     (is (= 3.0 (:ok (calculate "1 + 2" history))))
     (is (= -1.0 (:ok (calculate "1 - 2" history))))
     (is (= 2.0 (:ok (calculate "1 * 2" history))))
-    (is (= 0.5 (:ok (calculate "1 / 2" history))))))
+    (is (= 0.5 (:ok (calculate "1 / 2" history))))
+    (is (= 4.0 (:ok (calculate "2 ^ 2" history))))
+    (is (= 1.0 (:ok (calculate "1 % 2" history))))))
 
 (deftest compound-arithmetic-expressions
   (testing "compound expressions with three operands"
