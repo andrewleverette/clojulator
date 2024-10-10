@@ -35,7 +35,7 @@ This project is still a work in progress and I will continue to improve it.
    - Include error handling for invalid inputs and invalid operations.
 4. **REPL Operation:**
    - The calculator should run in a loop, continuously accepting input until a stop command is given.
-   - The stop command will be `"quit"`, which the user can type to stop the program.
+   - The stop commands will be `"quit"` or `"exit"`, which the user can type to stop the program.
 5. **(Stretch Goal 1) Expression Parsing:**
    - Support for user input of more complex expressions, allowing users to input expressions like `1 + 2 * 3` or `(1 + 2) * 3`.
    - Expressions are parsed into an AST before being evaluated.

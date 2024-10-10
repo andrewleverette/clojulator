@@ -8,17 +8,17 @@
 
 (defn display-welcome-message
   []
-  (printer/display-line "================================================")
+  (printer/display-line "==================================================")
   (printer/display-line "Welcome to Calculator REPL")
   (printer/display-line "Enter an arithmetic expression to evaluate")
-  (printer/display-line "Currently supported operators: + - * / ^")
+  (printer/display-line "Currently supported operators: + - * / ^ %")
   (printer/display-line "History trakcing is available via 'p1', 'p2', 'p3'")
-  (printer/display-line "Type 'quit' to exit")
-  (printer/display-line "================================================"))
+  (printer/display-line "Type 'quit' or 'exit'  to stop the REPL")
+  (printer/display-line "=================================================="))
 
 (defn should-quit?
   [s]
-  (= s "quit"))
+  (#{"quit" "exit"} s))
 
 (defn calculate
   [input history]
