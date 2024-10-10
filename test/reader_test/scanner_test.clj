@@ -42,12 +42,14 @@
     (is (= [(number->token "1" 0) (symbol->token \+  2) (number->token "2" 4)] (tokenize "1 + 2")))
     (is (= [(number->token "1" 0) (symbol->token \- 2) (number->token "2" 4)] (tokenize "1 - 2")))
     (is (= [(number->token "1" 0) (symbol->token \*  2) (number->token "2" 4)] (tokenize "1 * 2")))
-    (is (= [(number->token "1" 0) (symbol->token \/ 2) (number->token "2" 4)] (tokenize "1 / 2")))))
+    (is (= [(number->token "1" 0) (symbol->token \/ 2) (number->token "2" 4)] (tokenize "1 / 2")))
+    (is (= [(number->token "2" 0) (symbol->token \^ 2) (number->token "2" 4)] (tokenize "2 ^ 2")))))
 
 (deftest complex-expressions
   (testing "expressions with compound operations"
     (is (= [(number->token "1" 0) (symbol->token \+ 2) (number->token "2" 4) (symbol->token \- 6) (number->token "3" 8)] (tokenize "1 + 2 - 3")))
-    (is (= [(number->token "1" 0) (symbol->token \* 2) (number->token "2" 4) (symbol->token \/ 6) (number->token "3" 8)] (tokenize "1 * 2 / 3"))))
+    (is (= [(number->token "1" 0) (symbol->token \* 2) (number->token "2" 4) (symbol->token \/ 6) (number->token "3" 8)] (tokenize "1 * 2 / 3")))
+    (is (= [(number->token "2" 0) (symbol->token \* 2) (number->token "2" 4) (symbol->token \^ 6) (number->token "3" 8)] (tokenize "2 * 2 ^ 3"))))
   (testing "expressions with parentheses"
     (is (= [(symbol->token \( 0)
             (number->token "1" 1)
@@ -66,4 +68,5 @@
     (is (= [(symbol->token "p1" 0) (symbol->token \+ 3) (number->token "2" 5)] (tokenize "p1 + 2")))
     (is (= [(number->token "2" 0) (symbol->token \- 2) (symbol->token "p2" 4)] (tokenize "2 - p2")))
     (is (= [(number->token "2" 0) (symbol->token \* 2) (symbol->token "p3" 4)] (tokenize "2 * p3")))
-    (is (= [(symbol->token "p1" 0) (symbol->token \/ 3) (number->token "2" 5)] (tokenize "p1 / 2")))))
+    (is (= [(symbol->token "p1" 0) (symbol->token \/ 3) (number->token "2" 5)] (tokenize "p1 / 2")))
+    (is (= [(number->token "2" 0) (symbol->token \^ 2) (symbol->token "p2" 4)] (tokenize "2 ^ p2")))))

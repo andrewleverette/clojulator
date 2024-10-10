@@ -1,5 +1,6 @@
 (ns calculator-repl.reader.parser
-  (:require [calculator-repl.reader.token :as tok]))
+  (:require
+   [calculator-repl.reader.token :as tok]))
 
 (declare expression)
 
@@ -79,11 +80,17 @@
            (:remaining right)))
         {:node expr :remaining remaining}))))
 
+(defn- exponent
+  "Exponent rule: <unary> ( ^ <unary> )*
+ Adds an exponent node to the AST if the next token matches :Caret."
+  [tokens]
+  (binary-expression tokens unary #{:Caret}))
+
 (defn- factor
   "Factor rule: <unary> ( [* /] <unary> )*
   Adds a factor node to the AST if the next token matches :Star or :Slash."
   [tokens]
-  (binary-expression tokens unary #{:Star :Slash}))
+  (binary-expression tokens exponent #{:Star :Slash}))
 
 (defn- term
   "Term rule: <factor> ( [+ -] <factor> )*

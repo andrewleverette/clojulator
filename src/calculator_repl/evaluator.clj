@@ -23,6 +23,8 @@
       second
       (evaluate history)))
 
+(defmethod evaluate :Caret [node history] (map-eval-reduce history Math/pow (rest node)))
+
 (defmethod evaluate :Star [node history] (map-eval-reduce history * (rest node)))
 
 (defmethod evaluate :Slash [node history] (map-eval-reduce history / (rest node)))

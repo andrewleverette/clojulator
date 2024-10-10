@@ -1,11 +1,12 @@
 (ns calculator-repl.reader.token)
 
-(def symbol-tokens {\( :OpenParen
-                    \) :CloseParen
-                    \+  :Plus
-                    \-  :Minus
-                    \*  :Star
-                    \/  :Slash
+(def symbol-tokens {\(   :OpenParen
+                    \)   :CloseParen
+                    \+   :Plus
+                    \-   :Minus
+                    \*   :Star
+                    \/   :Slash
+                    \^   :Caret
                     "p1" :Repl/*1
                     "p2" :Repl/*2
                     "p3" :Repl/*3})

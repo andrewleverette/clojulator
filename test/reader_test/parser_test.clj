@@ -23,6 +23,10 @@
     (is (= [:Env "p2"] (parse (tokenize "p2"))))
     (is (= [:Env "p3"] (parse (tokenize "p3"))))))
 
+(deftest exponentiation-tests
+  (testing "exponentiation should return an exponent node"
+    (is (= [:Caret [:Number 2.0] [:Number 2.0]] (parse (tokenize "2 ^ 2"))))))
+
 (deftest multiplicative-tests
   (testing "multiplying two numbers should return a multiplication node"
     (is (= [:Star [:Number 1.0] [:Number 2.0]] (parse (tokenize "1 * 2")))))
@@ -48,6 +52,12 @@
             [:Number 2.0]] (-> "1 - 2 + 2" tokenize parse)))))
 
 (deftest compound-expressions
+  (testing "exponentiation has higher precedence than multiplicative expressions"
+    (is (= [:Star
+            [:Number 2.0]
+            [:Caret
+             [:Number 2.0]
+             [:Number 3.0]]] (-> "2 * 2 ^ 3" tokenize parse))))
   (testing "multiplicative expressions have higher precedence than additive expressions"
     (is (= [:Plus
             [:Number 1.0]
