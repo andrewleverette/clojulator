@@ -1,6 +1,6 @@
-(ns calculator-repl.reader.parser
+(ns calculator-repl.parser
   (:require
-   [calculator-repl.reader.token :as tok]))
+   [calculator-repl.token :as tok]))
 
 (declare expression)
 
@@ -68,7 +68,7 @@
     (primary tokens)))
 
 (defn- binary-expression
-  "Helper function for term and factor rules."
+  "Helper function for term, factor, and exponent rules."
   [tokens rule matchers]
   (let [left (rule tokens)]
     (loop [expr (:node left)

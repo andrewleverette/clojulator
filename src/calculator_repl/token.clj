@@ -1,4 +1,4 @@
-(ns calculator-repl.reader.token)
+(ns calculator-repl.token)
 
 (def symbol-tokens {\(   :OpenParen
                     \)   :CloseParen

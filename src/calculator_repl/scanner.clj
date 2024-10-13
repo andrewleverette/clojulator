@@ -1,5 +1,5 @@
-(ns calculator-repl.reader.scanner
-  (:require [calculator-repl.reader.token :as tok]))
+(ns calculator-repl.scanner
+  (:require [calculator-repl.token :as tok]))
 
 (defn is-repl-symbol?
   [chars]

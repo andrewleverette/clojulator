@@ -3,7 +3,8 @@
   (:require
    [calculator-repl.printer :as printer]
    [calculator-repl.evaluator :refer [evaluate]]
-   [calculator-repl.reader.core :refer [read-expression]]
+   [calculator-repl.parser :refer [parse]]
+   [calculator-repl.scanner :refer [tokenize]]
    [calculator-repl.history :refer [update-history clear-history]]))
 
 (defn display-welcome-message
@@ -12,7 +13,7 @@
   (printer/display-line "Welcome to Calculator REPL")
   (printer/display-line "Enter an arithmetic expression to evaluate")
   (printer/display-line "Currently supported operators: + - * / ^ %")
-  (printer/display-line "History trakcing is available via 'p1', 'p2', 'p3'")
+  (printer/display-line "History tracking is available via 'p1', 'p2', 'p3'")
   (printer/display-line "Type 'quit' or 'exit'  to stop the REPL")
   (printer/display-line "=================================================="))
 
@@ -20,10 +21,16 @@
   [s]
   (#{"quit" "exit"} s))
 
+(defn exit-repl!
+  [history]
+  (clear-history history)
+  (printer/display-line "Bye!")
+  (System/exit 0))
+
 (defn calculate
   [input history]
   (try
-    (let [result (-> input read-expression (evaluate history))]
+    (let [result (-> input tokenize parse (evaluate history))]
       (update-history history result)
       {:ok result})
     (catch Exception e
@@ -37,9 +44,7 @@
       (printer/display "(in)=> " :with-flush? true)
       (let [input (read-line)]
         (if (should-quit? input)
-          (do
-            (clear-history history)
-            (printer/display-line "Bye!"))
+          (exit-repl! history)
           (let [{:keys [ok error]} (calculate input history)]
             (if ok
               (printer/display-line (str "(out)=> " ok))
