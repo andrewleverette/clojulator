@@ -5,7 +5,8 @@
    [calculator-repl.evaluator :refer [evaluate]]
    [calculator-repl.parser :refer [parse]]
    [calculator-repl.scanner :refer [tokenize]]
-   [calculator-repl.history :refer [update-history clear-history]]))
+   [calculator-repl.history :refer [update-history clear-history]]
+   [calculator-repl.reporter :refer [report]]))
 
 (defn display-welcome-message
   []
@@ -32,9 +33,9 @@
   (try
     (let [result (-> input tokenize parse (evaluate history))]
       (update-history history result)
-      {:ok result})
+      [:ok result])
     (catch Exception e
-      {:error (.getMessage e)})))
+      [:error (.getMessage e)])))
 
 (defn -main
   []
@@ -45,8 +46,6 @@
       (let [input (read-line)]
         (if (should-quit? input)
           (exit-repl! history)
-          (let [{:keys [ok error]} (calculate input history)]
-            (if ok
-              (printer/display-line (str "(out)=> " ok))
-              (printer/display-line (str "(err)=> " error)))
+          (let [result (calculate input history)]
+            (report result)
             (recur)))))))
