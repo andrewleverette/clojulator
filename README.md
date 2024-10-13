@@ -6,7 +6,7 @@ A simple calculator application that performs basic arithmetic operations in a R
 
 This calculator supports basic arithmetic operations (`+`, `-`, `*`, `/` `^`, `%`) and combinations of these operations using parentheses (`(1 + 2) * 3`) to change the order of operations, otherwise the default precedence is used. The application also supports history tracking for the last 3 expressions. These values can be referenced using (`p1`, `p2`, `p3`) in an expression.
 
-This project is an artifact of my Clojure learning journey. As a learning project, this applicattion is not intended to be a complete, fully functional calculator. It is intended to be used as a tool for me to practice building practical applications in Clojure. I would appreciate any constructive feedback. If you have any suggestions or feedback, please feel free to open an issue.
+This project is an artifact of my Clojure learning journey. As a learning project, this application is not intended to be a complete, fully functional calculator. It is intended to be used as a tool for me to practice building practical applications in Clojure. I would appreciate any constructive feedback. If you have any suggestions or feedback, please feel free to open an issue.
 
 This project is still a work in progress and I will continue to improve it.
 
