@@ -46,6 +46,6 @@
       (let [input (read-line)]
         (if (should-quit? input)
           (exit-repl! history)
-          (let [result (calculate input history)]
-            (report result)
+          (do
+            (report (calculate input history))
             (recur)))))))
