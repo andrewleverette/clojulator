@@ -1,5 +1,5 @@
-(ns calculator-repl.scanner
-  (:require [calculator-repl.token :as tok]))
+(ns clojulator.calculator.scanner
+  (:require [clojulator.calculator.token :as tok]))
 
 (defn is-repl-symbol?
   [chars]

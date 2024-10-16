@@ -1,6 +1,6 @@
-(ns evaluator-test
+(ns calculator-test.evaluator-test
   (:require [clojure.test :refer [deftest is testing]]
-            [calculator-repl.evaluator :refer [evaluate]]))
+            [clojulator.calculator.evaluator :refer [evaluate]]))
 
 (def history (atom []))
 

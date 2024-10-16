@@ -1,4 +1,4 @@
-(ns calculator-repl.printer)
+(ns clojulator.utils.printer)
 
 (defn- stdout-printer
   [message & {:keys [with-newline? with-flush?]

@@ -1,5 +1,5 @@
 {:paths ["src" "test"]
- :aliases {:run {:main-opts ["-m" "calculator-repl.core"]}
+ :aliases {:clojulator/repl {:main-opts ["-m" "clojulator.repl"]}
            :test {:extra-paths ["test"]
                   :extra-deps {io.github.cognitect-labs/test-runner
                                {:git/tag "v0.5.1" :git/sha "dfb30dd"}}

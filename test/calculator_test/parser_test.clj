@@ -1,7 +1,7 @@
-(ns parser-test
+(ns calculator-test.parser-test
   (:require [clojure.test :refer [deftest is testing]]
-            [calculator-repl.parser :refer [parse]]
-            [calculator-repl.scanner :refer [tokenize]]))
+            [clojulator.calculator.parser :refer [parse]]
+            [clojulator.calculator.scanner :refer [tokenize]]))
 
 (deftest numeric-expression-tests
   (testing "valid numbers should return a single node in AST"

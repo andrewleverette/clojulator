@@ -1,7 +1,7 @@
-(ns scanner-test
+(ns calculator-test.scanner-test
   (:require [clojure.test :refer [deftest is testing]]
-            [calculator-repl.token :refer [number->token symbol->token]]
-            [calculator-repl.scanner :refer [tokenize]]))
+            [clojulator.calculator.token :refer [number->token symbol->token]]
+            [clojulator.calculator.scanner :refer [tokenize]]))
 
 (defn generate-number-tokens
   ([end] (generate-number-tokens 0 end))

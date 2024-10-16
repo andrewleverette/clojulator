@@ -1,4 +1,4 @@
-(ns calculator-repl.token)
+(ns clojulator.calculator.token)
 
 (def symbol-tokens {\(   :OpenParen
                     \)   :CloseParen

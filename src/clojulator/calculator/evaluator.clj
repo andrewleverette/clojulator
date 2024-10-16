@@ -1,5 +1,5 @@
-(ns calculator-repl.evaluator
-  (:require [calculator-repl.history :refer [repl1 repl2 repl3]]))
+(ns clojulator.calculator.evaluator
+  (:require [clojulator.calculator.history :refer [repl1 repl2 repl3]]))
 
 (declare map-eval-reduce)
 

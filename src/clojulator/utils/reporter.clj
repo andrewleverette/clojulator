@@ -1,5 +1,5 @@
-(ns calculator-repl.reporter
-  (:require [calculator-repl.printer :as printer]))
+(ns clojulator.utils.reporter
+  (:require [clojulator.utils.printer :as printer]))
 
 (defmulti report first)
 

@@ -1,7 +1,7 @@
-(ns integration-test
+(ns calculator-test.integration-test
   (:require
    [clojure.test :refer [deftest is testing use-fixtures]]
-   [calculator-repl.core :refer [calculate]]))
+   [clojulator.calculator.core :refer [calculate]]))
 
 (def history (atom []))
 

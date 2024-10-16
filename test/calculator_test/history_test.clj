@@ -1,7 +1,7 @@
-(ns history-test
+(ns calculator-test.history-test
   (:require
    [clojure.test :refer [deftest is testing use-fixtures]]
-   [calculator-repl.history :refer [clear-history update-history repl1 repl2 repl3]]))
+   [clojulator.calculator.history :refer [clear-history update-history repl1 repl2 repl3]]))
 
 (def history (atom []))
 

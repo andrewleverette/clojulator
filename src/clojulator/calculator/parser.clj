@@ -1,6 +1,5 @@
-(ns calculator-repl.parser
-  (:require
-   [calculator-repl.token :as tok]))
+(ns clojulator.calculator.parser
+  (:require [clojulator.calculator.token :as tok]))
 
 (declare expression)
 

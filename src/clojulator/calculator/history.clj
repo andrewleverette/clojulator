@@ -1,4 +1,4 @@
-(ns calculator-repl.history)
+(ns clojulator.calculator.history)
 
 (defn clear-history
   [history]
