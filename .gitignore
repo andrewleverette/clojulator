@@ -2,5 +2,7 @@
 .cpache
 .lsp
 .calva
+.shadow-cljs
 output.calva-repl
 codealike.json
+node_modules/

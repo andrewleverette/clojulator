@@ -1,0 +1,21 @@
+goog.provide('clojulator.calculator.core');
+/**
+ * Given an expressions as a string, attempts to parse
+ *   the string and return the result. Updates the given
+ *   history object with the result.
+ */
+clojulator.calculator.core.calculate = (function clojulator$calculator$core$calculate(expression,history){
+try{var result = clojulator.calculator.evaluator.evaluate.cljs$core$IFn$_invoke$arity$2(clojulator.calculator.parser.parse(clojulator.calculator.scanner.tokenize(expression)),history);
+clojulator.calculator.history.update_history(history,result);
+
+return new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"ok","ok",967785236),result], null);
+}catch (e39690){if((e39690 instanceof Error)){
+var e = e39690;
+return new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"error","error",-978969032),cljs.core.ex_message(e)], null);
+} else {
+throw e39690;
+
+}
+}});
+
+//# sourceMappingURL=clojulator.calculator.core.js.map
