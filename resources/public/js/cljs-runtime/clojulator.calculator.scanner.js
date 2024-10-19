@@ -3,8 +3,8 @@ clojulator.calculator.scanner.is_repl_symbol_QMARK_ = (function clojulator$calcu
 var temp__5823__auto__ = cljs.core.first(chars);
 if(cljs.core.truth_(temp__5823__auto__)){
 var c = temp__5823__auto__;
-var G__39607 = [cljs.core.str.cljs$core$IFn$_invoke$arity$1(c),cljs.core.str.cljs$core$IFn$_invoke$arity$1(cljs.core.second(chars))].join('');
-return (clojulator.calculator.token.symbol_tokens.cljs$core$IFn$_invoke$arity$1 ? clojulator.calculator.token.symbol_tokens.cljs$core$IFn$_invoke$arity$1(G__39607) : clojulator.calculator.token.symbol_tokens.call(null, G__39607));
+var G__28998 = [cljs.core.str.cljs$core$IFn$_invoke$arity$1(c),cljs.core.str.cljs$core$IFn$_invoke$arity$1(cljs.core.second(chars))].join('');
+return (clojulator.calculator.token.symbol_tokens.cljs$core$IFn$_invoke$arity$1 ? clojulator.calculator.token.symbol_tokens.cljs$core$IFn$_invoke$arity$1(G__28998) : clojulator.calculator.token.symbol_tokens.call(null, G__28998));
 } else {
 return null;
 }
@@ -98,12 +98,12 @@ var temp__5821__auto__ = clojulator.calculator.scanner.scan_token(chars,index);
 if(cljs.core.truth_(temp__5821__auto__)){
 var token = temp__5821__auto__;
 var delta = ((clojulator.calculator.token.pos(token) + clojulator.calculator.token.length(token)) - index);
-var G__39632 = cljs.core.drop.cljs$core$IFn$_invoke$arity$2(delta,chars);
-var G__39633 = (index + delta);
-var G__39634 = cljs.core.conj.cljs$core$IFn$_invoke$arity$2(tokens,token);
-chars = G__39632;
-index = G__39633;
-tokens = G__39634;
+var G__29000 = cljs.core.drop.cljs$core$IFn$_invoke$arity$2(delta,chars);
+var G__29001 = (index + delta);
+var G__29002 = cljs.core.conj.cljs$core$IFn$_invoke$arity$2(tokens,token);
+chars = G__29000;
+index = G__29001;
+tokens = G__29002;
 continue;
 } else {
 return tokens;

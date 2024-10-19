@@ -6,3 +6,5 @@
 output.calva-repl
 codealike.json
 node_modules/
+
+/resources/public/js
