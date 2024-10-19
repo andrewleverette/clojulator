@@ -12,16 +12,23 @@
  :initialize
  (fn [_ _]
    {:history (atom [])
-    :lastResult ""}))
+    :last-expression ""
+    :last-result ""}))
 
 (rf/reg-event-db
  :calculate
  (fn [db [_ expression]]
    (let [[_ result] (calculate expression (:history db))]
-     (assoc db :lastResult result))))
+     (-> db
+         (assoc :last-expression expression)
+         (assoc :last-result result)))))
 
 ;; ----------------------------------
 ;; Subscriptions
+
+(rf/reg-sub
+ :last-expression
+ (fn [db _] (:last-expression db)))
 
 (rf/reg-sub
  :last-result
@@ -30,48 +37,24 @@
 ;; ----------------------------------
 ;; Views
 
-(defn expression-input
-  [value]
-  [:div
-   {:class "mb-3"}
-   [:label {:for "expressionInput" :class "form-label"} "Expression"]
-   [:input {:type "text"
-            :class "form-control"
-            :id "expressionInput"
-            :value @value
-            :on-change #(reset! value (-> % .-target .-value))}]])
-
-(defn output-view
+(defn header
   []
-  (let [result (rf/subscribe [:last-result])]
-    [:div
-     {:class "mb-3"}
-     [:label {:for "expressionOutput" :class "form-label"} "Result"]
-     [:input {:type "text"
-              :class "form-control"
-              :id "expressionOutput"
-              :value @result
-              :disabled true
-              :read-only true}]]))
+  [:div
+   {:class "text-center"}
+   [:h1 "Welcome to Clojulator!"]
+   [:h4 "A calculator written in Clojure"]])
+
+(defn display
+  [output])
 
 (defn calculator-view
-  []
-  (let [expression (r/atom nil)]
-    (fn []
-      [:div
-       {:class "w-50"}
-       (expression-input expression)
-       (output-view)
-       [:div
-        {:class "mb-3 d-flex justify-content-center"}
-        [:button {:type "button" :class "btn btn-primary"
-                  :on-click #(rf/dispatch [:calculate @expression])} "Calculate"]]])))
+  [])
 
 (defn index
   []
   [:div
-   {:class "d-flex flex-column align-items-center"}
-   [:h1 "Clojulator"]
+   {:class "flex flex-col items-center min-h-screen"}
+   [header]
    [calculator-view]])
 
 ;; ----------------------------------

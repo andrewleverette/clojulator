@@ -9,11 +9,11 @@ try{var result = clojulator.calculator.evaluator.evaluate.cljs$core$IFn$_invoke$
 clojulator.calculator.history.update_history(history,result);
 
 return new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"ok","ok",967785236),result], null);
-}catch (e39690){if((e39690 instanceof Error)){
-var e = e39690;
+}catch (e29193){if((e29193 instanceof Error)){
+var e = e29193;
 return new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"error","error",-978969032),cljs.core.ex_message(e)], null);
 } else {
-throw e39690;
+throw e29193;
 
 }
 }});
