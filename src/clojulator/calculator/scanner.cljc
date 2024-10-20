@@ -1,41 +1,41 @@
 (ns clojulator.calculator.scanner
   (:require [clojulator.calculator.token :as tok]))
 
-(defn is-repl-symbol?
+(defn- is-repl-symbol?
   [chars]
   (when-let [c (first chars)]
     (-> c
         (str (second chars))
         (tok/symbol-tokens))))
 
-(defn is-symbol? [c]
+(defn- is-symbol? [c]
   (tok/symbol-tokens c))
 
-(defn is-digit?
+(defn- is-digit?
   [c]
   (when (not= nil c)
     #?(:clj (Character/isDigit c)
        :cljs (re-matches #"\d" (str c)))))
 
-(defn is-whitespace?
+(defn- is-whitespace?
   [c]
   #?(:clj (Character/isWhitespace c)
      :cljs (re-matches #"\s" (str c))))
 
-(defn ignore-whitespace
+(defn- ignore-whitespace
   [chars]
   (drop-while is-whitespace? chars))
 
-(defn integer-lexeme
+(defn- integer-lexeme
   [chars]
   (apply str (take-while is-digit? chars)))
 
-(defn fractional-lexeme
+(defn- fractional-lexeme
   [chars]
   (when (= \. (first chars))
     (integer-lexeme (rest chars))))
 
-(defn number-lexeme
+(defn- number-lexeme
   [chars]
   (let [int-part (integer-lexeme chars)
         int-length (count int-part)
@@ -44,12 +44,12 @@
       int-part
       (str int-part "." fractional-part))))
 
-(defn repl-lexeme
+(defn- repl-lexeme
   [chars]
   (when-let [c (first chars)]
     (str c (second chars))))
 
-(defn scan-token
+(defn- scan-token
   "Scans for the next token in the source string ignoring whitespace."
   [characters index]
   (when (seq characters)
