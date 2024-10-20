@@ -1,6 +1,5 @@
 (ns clojulator.web.core
   (:require
-   [reagent.core :as r]
    [reagent.dom.client :as rdc]
    [re-frame.core :as rf]
    [clojulator.calculator.core :refer [calculate]]))
@@ -12,33 +11,39 @@
  :initialize
  (fn [_ _]
    {:history (atom [])
-    :last-expression ""
-    :last-result ""
-    :display ""}))
+    :last-result nil
+    :display ""
+    :should-append? true}))
 
 (rf/reg-event-db
  :calculate
- (fn [db [_ expression]]
-   (let [[_ result] (calculate expression (:history db))]
+ (fn [db [_]]
+   (let [expression (:display db)
+         [_ result] (calculate expression (:history db))]
      (-> db
-         (assoc :last-expression expression)
-         (assoc :last-result result)))))
+         (assoc :should-append? false)
+         (assoc :last-result result)
+         (assoc :display result)))))
 
 (rf/reg-event-db
  :update-display
  (fn [db [_ c]]
-   (update db :display str c)))
+   (let [should-append? (:should-append? db)
+         new-state (if should-append? db (assoc db :should-append? true))
+         f (if should-append? str (fn [_] (str c)))]
+     (update new-state :display f c))))
+
+(rf/reg-event-db
+ :clear-display
+ (fn [db _]
+   (assoc db :display "")))
 
 ;; ----------------------------------
 ;; Subscriptions
 
 (rf/reg-sub
- :last-expression
- (fn [db _] (:last-expression db)))
-
-(rf/reg-sub
  :last-result
- (fn [db _] (:lastResult db)))
+ (fn [db _] (:last-result db)))
 
 (rf/reg-sub
  :display
@@ -56,16 +61,19 @@
 
 (defn display
   []
-  (let [display (rf/subscribe [:display])]
+  (let [display-text (rf/subscribe [:display])
+        last-result (rf/subscribe [:last-result])]
     [:div
      {:class "w-full h-16 sm:h-28 bg-white border-2 border-blue-400 rounded-lg mt-5 md:mt-0 flex flex-col justify-evenly items-end pr-2 border-blue-500"}
      [:div
       {:class "place-self-center py-1"}
       [:div
-       {:id "previous-expression"}]
+       {:id "previous-expression"}
+       (when @last-result
+         (str "Ans = " @last-result))]
       [:div
        {:id "current-display"
-        :class "text-2xl md:text-3xl font-semibold"} @display]]]))
+        :class "text-2xl md:text-3xl font-semibold"} @display-text]]]))
 
 (defn symbol-keys
   []
@@ -74,8 +82,10 @@
       [:div
        {:class "basic-operations col-span-3 grid grid-cols-2 [&>*]:py-5 [&>*]:px-2.5 [&>*]:sm:px-6 gap-2 [&>*:hover]:bg-blue-900 [&>*]:rounded [&>*:hover]:text-white [&>*:active]:scale-90"}
        [:button {:key "clear"
-                 :class "col-span-2 bg-slate-300"} "CLR"]
-       (map #(vector :button {:key % :class "bg-slate-300"} %) operators)])))
+                 :class "col-span-2 bg-slate-300"
+                 :on-click (fn [] (rf/dispatch [:clear-display]))} "CLR"]
+       (map #(vector :button {:key % :class "bg-slate-300"
+                              :on-click (fn [] (rf/dispatch [:update-display %]))} %) operators)])))
 
 (defn numeric-keys
   []
@@ -83,9 +93,10 @@
     (fn []
       [:div
        {:class "number mr-2 col-span-9 grid grid-cols-3 gap-2 [&>*:hover]:bg-blue-900 [&>*]:rounded [&>*:hover]:text-white [&>*:active]:scale-90"}
-       (map #(vector :button {:key % :class "bg-slate-100"} %) numbers)
+       (map #(vector :button {:key % :class "bg-slate-100" :on-click (fn [] (rf/dispatch [:update-display %]))} %) numbers)
        [:button {:key "enter"
-                 :class "bg-[#3651c4] text-white"} "="]])))
+                 :class "bg-[#3651c4] text-white"
+                 :on-click (fn [] (rf/dispatch [:calculate]))} "="]])))
 
 (defn keypad
   []
