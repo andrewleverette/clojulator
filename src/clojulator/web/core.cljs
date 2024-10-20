@@ -89,10 +89,12 @@
 
 (defn numeric-keys
   []
-  (let [numbers [7 8 9 4 5 6 1 2 3 0 "."]]
+  (let [numbers [7 8 9 4 5 6 1 2 3 0 "."]
+        last-three-expressions ["p1" "p2" "p3"]]
     (fn []
       [:div
        {:class "number mr-2 col-span-9 grid grid-cols-3 gap-2 [&>*:hover]:bg-blue-900 [&>*]:rounded [&>*:hover]:text-white [&>*:active]:scale-90"}
+       (map #(vector :button {:key % :class "bg-slate-300" :on-click (fn [] (rf/dispatch [:update-display %]))} %) last-three-expressions)
        (map #(vector :button {:key % :class "bg-slate-100" :on-click (fn [] (rf/dispatch [:update-display %]))} %) numbers)
        [:button {:key "enter"
                  :class "bg-[#3651c4] text-white"
