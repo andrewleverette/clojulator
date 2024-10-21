@@ -19,11 +19,13 @@
  :calculate
  (fn [db [_]]
    (let [expression (:display db)
-         [_ result] (calculate expression (:history db))]
-     (-> db
-         (assoc :should-append? false)
-         (assoc :last-result result)
-         (assoc :display result)))))
+         [result value] (calculate expression (:history db))
+         new-state (-> db
+                       (assoc :should-append? false)
+                       (assoc :display (str value)))]
+     (if (= result :ok)
+       (assoc new-state :last-result value)
+       new-state))))
 
 (rf/reg-event-db
  :update-display
@@ -64,11 +66,11 @@
   (let [display-text (rf/subscribe [:display])
         last-result (rf/subscribe [:last-result])]
     [:div
-     {:class "w-full h-16 sm:h-28 bg-white border-2 border-blue-400 rounded-lg mt-5 md:mt-0 flex flex-col justify-evenly items-end pr-2 border-blue-500"}
+     {:class "w-full h-16 sm:h-28 bg-white border-2 border-blue-400 rounded-lg mt-5 md:mt-0 flex flex-col justify-evenly items-end pr-2 border-blue-500 text-right"}
      [:div
-      {:class "place-self-center py-1"}
       [:div
-       {:id "previous-expression"}
+       {:class "text-slate-600/50"
+        :id "previous-expression"}
        (when @last-result
          (str "Ans = " @last-result))]
       [:div
