@@ -15,6 +15,27 @@ This project is still a work in progress and I will continue to improve it.
 
 ---
 
+## Running the Application
+
+### REPL Mode
+
+To run the REPL, run the following command:
+
+```bash
+clj -M:clojulator/repl
+```
+
+***This application does not support Leiningen.***
+
+### Web Mode
+
+To run the web application, run the following command:
+
+```bash
+npm run watch
+```
+
+
 ## Project Details
 
 The following sections layout the original objectives and requirements of the project. The goal of this project was to be a vehicle for learning Clojure by building a practical project, specifically a simple calculator application that runs as a REPL. I expanded the project to explore cross-compilation and ClojureScript by adding a web UI that utilizes the same interpreter source code as the REPL.
