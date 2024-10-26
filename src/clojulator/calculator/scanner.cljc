@@ -50,7 +50,8 @@
     (str c (second chars))))
 
 (defn- scan-token
-  "Scans for the next token in the source string ignoring whitespace."
+  "Scans for the next token in the source string ignoring whitespace.
+  Returns nil if characters is empty or consists of only whitespace."
   [characters index]
   (when (seq characters)
     (let [trimmed (ignore-whitespace characters)
@@ -61,12 +62,13 @@
           (is-repl-symbol? trimmed) (-> trimmed repl-lexeme (tok/symbol->token pos))
           (is-symbol? c) (tok/symbol->token c pos)
           (is-digit? c) (-> trimmed number-lexeme (tok/number->token pos))
-          :else (throw
-                 #?(:clj (Exception. (str "Unknown character: '" c "' at position " pos))
-                    :cljs (js/Error. (str "Unknown character: '" c "' at position " pos)))))))))
+          :else (let [error-msg (str "Unknown character: '" c "' at position " pos)]
+                  (throw
+                   #?(:clj (Exception. error-msg)
+                      :cljs (js/Error. error-msg)))))))))
 
 (defn tokenize
-  "Given a string, returns a list of tokens."
+  "Given a source string, returns a list of tokens."
   [source]
   (loop [chars (seq source)
          index 0

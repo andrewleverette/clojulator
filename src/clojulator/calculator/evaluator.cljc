@@ -13,8 +13,9 @@
       "p1" (repl1 history)
       "p2" (repl2 history)
       "p3" (repl3 history)
-      (throw #?(:clj (Exception. (str "Unknown evnironment variable: " var-name))
-                :cljs (js/Error. (str "Unknown evnironment variable: " var-name)))))))
+      (let [error-msg (str "Unknown evnironment variable: " var-name)]
+        (throw #?(:clj (Exception. error-msg)
+                  :cljs (js/Error. error-msg)))))))
 
 (defmethod evaluate :Number [node _history] (second node))
 

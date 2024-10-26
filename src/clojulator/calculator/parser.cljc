@@ -4,14 +4,17 @@
 (declare expression)
 
 (defn- parser-error
-  ([] (throw #?(:clj (Exception. "Unexpected end of input")
-                :cljs (js/Error. "Unexpected end of input"))))
+  ([] (let [error-msg "Unexpected end of input"]
+        (throw #?(:clj (Exception. error-msg)
+                  :cljs (js/Error. error-msg)))))
   ([tokens]
    (if-let [token (first tokens)]
-     (throw #?(:clj (Exception. (str "Unexpected token '" (tok/lexeme token) "' at position " (tok/pos token)))
-               :cljs (js/Error. (str "Unexpected token '" (tok/lexeme token) "' at position " (tok/pos token)))))
-     (throw #?(:clj (Exception. "Unexpected end of input")
-               :cljs (js/Error. "Unexpected end of input"))))))
+     (let [error-msg (str "Unexpected token '" (tok/lexeme token) "' at position " (tok/pos token))]
+       (throw #?(:clj (Exception. error-msg)
+                 :cljs (js/Error. error-msg))))
+     (let [error-msg "Unexpected end of input"]
+       (throw #?(:clj (Exception. error-msg)
+                 :cljs (js/Error. error-msg)))))))
 
 (defn- match
   "Returns the type of the first token in the token seqence if it matches
@@ -52,7 +55,7 @@
 
 (defn- primary
   "Primary rule: <group> | <env> | <number>
-  Matches either a number literal, a group node, or an environment variable."
+  Matches a group node, an environment variable, or a number literal."
   [tokens]
   (cond
     (match tokens #{:OpenParen}) (group tokens)
@@ -84,13 +87,13 @@
 
 (defn- exponent
   "Exponent rule: <unary> ( ^ <unary> )*
- Adds an exponent node to the AST if the next token matches :Caret."
+  Adds an exponent node to the AST if the next token matches :Caret."
   [tokens]
   (binary-expression tokens unary #{:Caret}))
 
 (defn- factor
   "Factor rule: <exponent> ( [* / %] <exponent> )*
-  Adds a factor node to the AST if the next token matches :Star or :Slash."
+  Adds a factor node to the AST if the next token matches :Star, :Slash, or :Modulo."
   [tokens]
   (binary-expression tokens exponent #{:Star :Slash :Modulo}))
 

@@ -1,5 +1,8 @@
 (ns clojulator.calculator.token)
 
+;; Symbols that can be turned into tokens
+;; Most symbols are represented as a single
+;; character, but the history symbols are strings
 (def symbol-tokens {\(   :OpenParen
                     \)   :CloseParen
                     \+   :Plus
@@ -23,13 +26,15 @@
     :len len}))
 
 (defn number->token
-  "Given a number and a position, return a token"
+  "Given a number and a position, return a token 
+  that represents a numeric value in the expression."
   [n pos]
   (let [lexeme (str n)]
     (token :Number lexeme pos (count lexeme) (parse-double n))))
 
 (defn symbol->token
-  "Given a symbol and a position, return a token"
+  "Given a symbol and a position, return a token
+  that represents a symbol in the expression."
   [s pos]
   (when-let [token-type (symbol-tokens s)]
     (let [lexeme (str s)]
