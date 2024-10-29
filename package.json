@@ -7,10 +7,6 @@
     "tailwind:build": "tailwindcss -i ./src/clojulator/web/css/app.css -o ./resources/public/app.css",
     "tailwind:watch": "tailwindcss -i ./src/clojulator/web/css/app.css -o ./resources/public/app.css --watch"
   },
-  "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
-  },
   "devDependencies": {
     "shadow-cljs": "^2.28.17",
     "tailwindcss": "^3.4.14"
