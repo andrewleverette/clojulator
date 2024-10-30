@@ -3,34 +3,34 @@
 ;; Symbols that can be turned into tokens
 ;; Most symbols are represented as a single
 ;; character, but the history symbols are strings
-(def symbol-tokens {\(   :OpenParen
-                    \)   :CloseParen
-                    \+   :Plus
-                    \-   :Minus
-                    \*   :Star
-                    \/   :Slash
-                    \^   :Caret
-                    \%   :Modulo
-                    "p1" :Repl/*1
-                    "p2" :Repl/*2
-                    "p3" :Repl/*3})
+(def symbol-tokens {\(   :token/OpenParen
+                    \)   :token/CloseParen
+                    \+   :token/Plus
+                    \-   :token/Minus
+                    \*   :token/Star
+                    \/   :token/Slash
+                    \^   :token/Caret
+                    \%   :token/Modulo
+                    "p1" :token/*1
+                    "p2" :token/*2
+                    "p3" :token/*3})
 
 (defn token
   "Token constructor"
   ([type lexeme pos len] (token type lexeme pos len nil))
   ([type lexeme pos len literal]
-   {:type type
-    :lexeme lexeme
-    :literal literal
-    :pos pos
-    :len len}))
+   {:token/type type
+    :token/lexeme lexeme
+    :token/literal literal
+    :token/pos pos
+    :token/len len}))
 
 (defn number->token
   "Given a number and a position, return a token 
   that represents a numeric value in the expression."
   [n pos]
   (let [lexeme (str n)]
-    (token :Number lexeme pos (count lexeme) (parse-double n))))
+    (token :token/Number lexeme pos (count lexeme) (parse-double n))))
 
 (defn symbol->token
   "Given a symbol and a position, return a token
@@ -42,20 +42,20 @@
 
 (defn token-type
   [token]
-  (:type token))
+  (:token/type token))
 
 (defn lexeme
   [token]
-  (:lexeme token))
+  (:token/lexeme token))
 
 (defn literal
   [token]
-  (:literal token))
+  (:token/literal token))
 
 (defn pos
   [token]
-  (:pos token))
+  (:token/pos token))
 
 (defn length
   [token]
-  (:len token))
+  (:token/len token))

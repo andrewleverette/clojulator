@@ -7,7 +7,7 @@
   ([end] (generate-number-tokens 0 end))
   ([start end] (->> (range start end) (map (fn [n] [[(number->token (str n) 0)] (tokenize (str n))])))))
 
-(deftest simple-numeric-expressionk
+(deftest simple-numeric-expression
   (testing "single digit numbers should return valid tokens"
     (let [results (generate-number-tokens 10)]
       (is (every? (fn [[a b]] (= a b)) results))))
