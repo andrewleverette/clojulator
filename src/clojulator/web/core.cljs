@@ -48,7 +48,6 @@
 
 (defalias display
   [{:keys [last-result display]}]
-  (js/console.log "Display" display)
   [:div
    {:class ["w-full" "h-16" "sm:h-28" "bg-white" "border-2" "border-blue-400" "rounded-lg" "mt-5" "md:mt-0" "flex" "flex-col" "justify-evenly" "items-end" "pr-2" "border-blue-500" "text-right"]}
    [:div
@@ -112,7 +111,6 @@
 (defn render [root]
   (add-watch state :display
              (fn [_ _ _ new-state]
-               (js/console.log "Rendering wiht new state" new-state)
                (r/render root (index new-state))))
   (r/render root (index @state)))
 

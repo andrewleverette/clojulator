@@ -29,11 +29,11 @@
   inner expression is enclosed in a :CloseParen. Otherwise, throws a syntax
   error."
   [tokens]
-  (when (match tokens #{:OpenParen})
+  (when (match tokens #{:token/OpenParen})
     (let [expr (expression (rest tokens))
           remaining-tokens (:remaining expr)]
-      (if (match remaining-tokens #{:CloseParen})
-        {:node [:Group (:node expr)] :remaining (rest remaining-tokens)}
+      (if (match remaining-tokens #{:token/CloseParen})
+        {:node [:node/Group (:node expr)] :remaining (rest remaining-tokens)}
         (parser-error (:remaining expr))))))
 
 (defn- env
@@ -41,16 +41,16 @@
   Adds an environment variable node to the AST if the next token matches
   :Repl/*1, :Repl/*2, or :Repl/*3."
   [tokens]
-  (if (match tokens #{:Repl/*1 :Repl/*2 :Repl/*3})
-    {:node [:Env (tok/lexeme (first tokens))] :remaining (rest tokens)}
+  (if (match tokens #{:token/*1 :token/*2 :token/*3})
+    {:node [:node/Env (tok/lexeme (first tokens))] :remaining (rest tokens)}
     (parser-error tokens)))
 
 (defn- number
   "Number rule: <number>
   Adds a number literal to the AST if the next token matches :Number"
   [tokens]
-  (if (match tokens #{:Number})
-    {:node [:Number (tok/literal (first tokens))] :remaining (rest tokens)}
+  (if (match tokens #{:token/Number})
+    {:node [:node/Number (tok/literal (first tokens))] :remaining (rest tokens)}
     (parser-error tokens)))
 
 (defn- primary
@@ -58,8 +58,8 @@
   Matches a group node, an environment variable, or a number literal."
   [tokens]
   (cond
-    (match tokens #{:OpenParen}) (group tokens)
-    (match tokens #{:Repl/*1 :Repl/*2 :Repl/*3}) (env tokens)
+    (match tokens #{:token/OpenParen}) (group tokens)
+    (match tokens #{:token/*1 :token/*2 :token/*3}) (env tokens)
     :else (number tokens)))
 
 (defn- unary
@@ -67,9 +67,9 @@
   Adds a unary node to the AST if the next token matches :Minus. 
   Otherwise, matches a primary node."
   [tokens]
-  (if-let [minus (match tokens #{:Minus})]
+  (if (match tokens #{:token/Minus})
     (let [p (unary (rest tokens))]
-      {:node [minus (:node p)] :remaining (:remaining p)})
+      {:node [:node/Minus (:node p)] :remaining (:remaining p)})
     (primary tokens)))
 
 (defn- binary-expression
@@ -81,7 +81,7 @@
       (if-let [operator (match remaining matchers)]
         (let [right (rule (rest remaining))]
           (recur
-           [operator expr (:node right)]
+           [(keyword "node" (name operator)) expr (:node right)]
            (:remaining right)))
         {:node expr :remaining remaining}))))
 
@@ -89,19 +89,19 @@
   "Exponent rule: <unary> ( ^ <unary> )*
   Adds an exponent node to the AST if the next token matches :Caret."
   [tokens]
-  (binary-expression tokens unary #{:Caret}))
+  (binary-expression tokens unary #{:token/Caret}))
 
 (defn- factor
   "Factor rule: <exponent> ( [* / %] <exponent> )*
   Adds a factor node to the AST if the next token matches :Star, :Slash, or :Modulo."
   [tokens]
-  (binary-expression tokens exponent #{:Star :Slash :Modulo}))
+  (binary-expression tokens exponent #{:token/Star :token/Slash :token/Modulo}))
 
 (defn- term
   "Term rule: <factor> ( [+ -] <factor> )*
   Adds a term node to the AST if the next token matches :Plus or :Minus."
   [tokens]
-  (binary-expression tokens factor #{:Plus :Minus}))
+  (binary-expression tokens factor #{:token/Plus :token/Minus}))
 
 (defn- expression
   "Expression rule: <term>
