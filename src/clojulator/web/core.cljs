@@ -10,17 +10,31 @@
                                 :display ""
                                 :should-append? true}))
 
+(defn handle-calculate
+  [db]
+  (let [expression (:display db)
+        history (:history db)
+        [result value] (calculate expression history)
+        new-state (-> db
+                      (assoc :should-append? false)
+                      (assoc :display (str value)))]
+    (if (= result :ok)
+      (assoc new-state :last-result (str "Ans = " value))
+      new-state)))
+
 (defn- update-display
   [db value]
   (let [should-append? (:should-append? db)
         new-state (if should-append? db (assoc db :should-append? true))
         f (if should-append? str (fn [_] (str value)))]
-    (update new-state :display f)))
+    (update new-state :display f value)))
 
 (r/set-dispatch!
  (fn [_ action]
    (let [[op data] action]
      (case op
+       :api/calculate (swap! state handle-calculate)
+       :display/clear (swap! state assoc :display "")
        :display/update (swap! state update-display data)))))
 
 ;; Components
@@ -98,6 +112,7 @@
 (defn render [root]
   (add-watch state :display
              (fn [_ _ _ new-state]
+               (js/console.log "Rendering wiht new state" new-state)
                (r/render root (index new-state))))
   (r/render root (index @state)))
 
