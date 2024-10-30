@@ -10,6 +10,19 @@
                                 :display ""
                                 :should-append? true}))
 
+(defn- update-display
+  [db value]
+  (let [should-append? (:should-append? db)
+        new-state (if should-append? db (assoc db :should-append? true))
+        f (if should-append? str (fn [_] (str value)))]
+    (update new-state :display f)))
+
+(r/set-dispatch!
+ (fn [_ action]
+   (let [[op data] action]
+     (case op
+       :display/update (swap! state update-display data)))))
+
 ;; Components
 
 (defalias header
@@ -20,16 +33,17 @@
    [:h4 "A calculator written in Clojure"]])
 
 (defalias display
-  []
+  [{:keys [last-result display]}]
+  (js/console.log "Display" display)
   [:div
    {:class ["w-full" "h-16" "sm:h-28" "bg-white" "border-2" "border-blue-400" "rounded-lg" "mt-5" "md:mt-0" "flex" "flex-col" "justify-evenly" "items-end" "pr-2" "border-blue-500" "text-right"]}
    [:div
     [:div
      {:class "text-slate-600/50"
-      :id "previous-expression"}]
+      :id "previous-expression"} last-result]
     [:div
      {:id "current-display"
-      :class ["text-2xl" "md:text-3xl" "font-semibold"]} ""]]])
+      :class ["text-2xl" "md:text-3xl" "font-semibold"]} display]]])
 
 (defalias symbol-keys
   []
@@ -38,9 +52,9 @@
      {:class ["basic-operations" "col-span-3" "grid" "grid-cols-2" "[&>*]:py-5" "[&>*]:px-2.5" "[&>*]:sm:px-6" "gap-2" "[&>*:hover]:bg-blue-900" "[&>*]:rounded" "[&>*:hover]:text-white" "[&>*:active]:scale-90"]}
      [:button {:key "clear"
                :class ["col-span-2" "bg-slate-300"]
-               :on {:click (fn [] (js/console.log "ClR clicked"))}} "CLR"]
+               :on {:click [:display/clear]}} "CLR"]
      (map #(vector :button {:key % :class "bg-slate-300"
-                            :on {:click (fn [] (js/console.log "Symbol clicked " %))}} %) operators)]))
+                            :on {:click [:display/update %]}} %) operators)]))
 
 (defalias numeric-keys
   []
@@ -48,11 +62,11 @@
         last-three-expressions ["p1" "p2" "p3"]]
     [:div
      {:class ["number" "mr-2" "col-span-9" "grid" "grid-cols-3" "gap-2" "[&>*:hover]:bg-blue-900" "[&>*]:rounded" "[&>*:hover]:text-white" "[&>*:active]:scale-90"]}
-     (map #(vector :button {:key % :class "bg-slate-300" :on {:click (fn [] (js/console.log "REPL expression clicked " %))}} %) last-three-expressions)
-     (map #(vector :button {:key % :class "bg-slate-100" :on {:click (fn [] (js/console.log "Number clicked " %))}} %) numbers)
+     (map #(vector :button {:key % :class "bg-slate-300" :on {:click [:display/update %]}} %) last-three-expressions)
+     (map #(vector :button {:key % :class "bg-slate-100" :on {:click [:display/update %]}} %) numbers)
      [:button {:key "enter"
                :class ["bg-[#3651c4]" "text-white"]
-               :on {:click (fn [] (js/console.log "Enter clicked"))}} "="]]))
+               :on {:click [:api/calculate]}} "="]]))
 
 (defalias keypad
   []
@@ -62,25 +76,31 @@
    [symbol-keys]])
 
 (defalias calculator
-  []
+  [data]
   [:div
    {:class ["flex" "flex-col" "items-center" "gap-3" "font-bold"]}
-   [display]
+   [display data]
    [keypad]])
 
 ;; Views
 
 (defn index
-  []
+  [data]
   [:div
    {:class ["bg-slate-400" "flex" "flex-col" "items-center" "min-h-screen"]}
    [:main
     {:class ["w-full" "max-w-lg" "select-none" "px-4" "md:px-0"]}
     [header]
-    [calculator]]])
+    [calculator data]]])
 
 ;; Entry Point
 
+(defn render [root]
+  (add-watch state :display
+             (fn [_ _ _ new-state]
+               (r/render root (index new-state))))
+  (r/render root (index @state)))
+
 (defn ^:export main []
   (let [root (js/document.getElementById "app")]
-    (r/render root (index))))
+    (render root)))
