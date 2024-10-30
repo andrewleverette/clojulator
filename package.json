@@ -4,6 +4,7 @@
   "description": "A calculator application implmented in Reframe",
   "scripts": {
     "watch": "npx shadow-cljs watch client",
+    "release": "npx shadow-cljs release client",
     "tailwind:build": "tailwindcss -i ./src/clojulator/web/css/app.css -o ./resources/public/app.css",
     "tailwind:watch": "tailwindcss -i ./src/clojulator/web/css/app.css -o ./resources/public/app.css --watch"
   },
