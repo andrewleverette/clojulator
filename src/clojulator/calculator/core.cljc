@@ -14,7 +14,8 @@
           value (-> expression tokenize parse (evaluate (:history state)))]
       (-> state
           (assoc :value value)
-          (assoc :history [value p1 p2])))
+          (assoc :history [value p1 p2])
+          (dissoc :error)))
     (catch #?(:clj Exception
               :cljs js/Error) e
       (assoc state :error (ex-message e)))))

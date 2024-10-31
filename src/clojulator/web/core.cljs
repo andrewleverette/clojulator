@@ -5,22 +5,19 @@
    [replicant.dom :as r]))
 
 ;; Private State
-(defonce ^:private state (atom {:history (atom [])
-                                :last-result nil
+(defonce ^:private state (atom {:history []
+                                :value nil
                                 :display ""
                                 :should-append? true}))
 
 (defn handle-calculate
   [db]
   (let [expression (:display db)
-        history (:history db)
-        [result value] (calculate expression history)
-        new-state (-> db
-                      (assoc :should-append? false)
-                      (assoc :display (str value)))]
-    (if (= result :ok)
-      (assoc new-state :last-result (str "Ans = " value))
-      new-state)))
+        new-db (calculate db expression)
+        {:keys [value error]} new-db]
+    (-> new-db
+        (assoc :should-append? false)
+        (assoc :display (if-not error value error)))))
 
 (defn- update-display
   [db value]
@@ -47,13 +44,13 @@
    [:h4 "A calculator written in Clojure"]])
 
 (defalias display
-  [{:keys [last-result display]}]
+  [{:keys [value display]}]
   [:div
    {:class ["w-full" "h-16" "sm:h-28" "bg-white" "border-2" "border-blue-400" "rounded-lg" "mt-5" "md:mt-0" "flex" "flex-col" "justify-evenly" "items-end" "pr-2" "border-blue-500" "text-right"]}
    [:div
     [:div
      {:class "text-slate-600/50"
-      :id "previous-expression"} last-result]
+      :id "previous-expression"} (when value (str "Ans = " value))]
     [:div
      {:id "current-display"
       :class ["text-2xl" "md:text-3xl" "font-semibold"]} display]]])
