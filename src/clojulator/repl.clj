@@ -1,7 +1,6 @@
 (ns clojulator.repl
   (:gen-class)
   (:require [clojulator.calculator.core :refer [calculate]]
-            [clojulator.calculator.history :refer [clear-history]]
             [clojulator.utils.printer :refer [display display-line]]
             [clojulator.utils.reporter :refer [report]]))
 
@@ -20,20 +19,18 @@
   (#{"quit" "exit"} s))
 
 (defn exit-repl!
-  [history]
-  (clear-history history)
+  []
   (display-line "Bye!")
   (System/exit 0))
 
 (defn -main
   []
   (display-welcome-message)
-  (let [history (atom [])]
-    (loop []
-      (display "(in)=> " :with-flush? true)
-      (let [input (read-line)]
-        (if (should-quit? input)
-          (exit-repl! history)
-          (do
-            (report (calculate input history))
-            (recur)))))))
+  (loop [history []]
+    (display "(in)=> " :with-flush? true)
+    (let [input (read-line)]
+      (if (should-quit? input)
+        (exit-repl!)
+        (let [{:keys [value error history]} (calculate {:history history} input)]
+          (report (if value [:ok value] [:error error]))
+          (recur history))))))
