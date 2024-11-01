@@ -10,7 +10,7 @@
                                 :display ""}))
 
 ;; Event Handlers
-(defn handle-calculate
+(defn- handle-calculate
   [db]
   (let [expression (:display db)
         new-db (calc/calculate db expression)
@@ -106,7 +106,7 @@
 
 ;; Entry Point
 
-(defn render [root]
+(defn- render [root]
   (add-watch state :display
              (fn [_ _ _ new-state]
                (r/render root (index new-state))))
