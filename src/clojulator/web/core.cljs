@@ -5,26 +5,23 @@
    [replicant.dom :as r]))
 
 ;; Private State
-(defonce ^:private state (atom {:history []
+(defonce ^:private state (atom {:history [0 0 0] ; Default to zero for memory values
                                 :value nil
-                                :display ""
-                                :should-append? true}))
+                                :display ""}))
 
-(defn handle-calculate
+;; Event Handlers
+(defn- handle-calculate
   [db]
   (let [expression (:display db)
         new-db (calc/calculate db expression)
         {:keys [value error]} new-db]
-    (-> new-db
-        (assoc :should-append? false)
-        (assoc :display (if-not error value error)))))
+    (assoc new-db :display (if-not error value error))))
 
 (defn- update-display
   [db value]
-  (let [should-append? (:should-append? db)
-        new-state (if should-append? db (assoc db :should-append? true))
-        f (if should-append? str (fn [_] (str value)))]
-    (update new-state :display f value)))
+  (update db :display str value))
+
+;; Dispatcher
 
 (r/set-dispatch!
  (fn [_ action]
@@ -60,29 +57,33 @@
   (let [operators ["-" "+" "/" "*" "%" "^" "(" ")"]]
     [:div
      {:class ["basic-operations" "col-span-3" "grid" "grid-cols-2" "[&>*]:py-5" "[&>*]:px-2.5" "[&>*]:sm:px-6" "gap-2" "[&>*:hover]:bg-blue-900" "[&>*]:rounded" "[&>*:hover]:text-white" "[&>*:active]:scale-90"]}
-     [:button {:key "clear"
-               :class ["col-span-2" "bg-slate-300"]
+     [:button {:class ["col-span-2" "bg-slate-300"]
                :on {:click [:display/clear]}} "CLR"]
-     (map #(vector :button {:key % :class "bg-slate-300"
+     (map #(vector :button {:class "bg-slate-300"
                             :on {:click [:display/update %]}} %) operators)]))
 
 (ra/defalias numeric-keys
-  []
-  (let [numbers [7 8 9 4 5 6 1 2 3 0 "."]
-        last-three-expressions ["p1" "p2" "p3"]]
+  [{:keys [history]}]
+  (let [numbers [7 8 9 4 5 6 1 2 3 0 "."]]
     [:div
      {:class ["number" "mr-2" "col-span-9" "grid" "grid-cols-3" "gap-2" "[&>*:hover]:bg-blue-900" "[&>*]:rounded" "[&>*:hover]:text-white" "[&>*:active]:scale-90"]}
-     (map #(vector :button {:key % :class "bg-slate-300" :on {:click [:display/update %]}} %) last-three-expressions)
-     (map #(vector :button {:key % :class "bg-slate-100" :on {:click [:display/update %]}} %) numbers)
-     [:button {:key "enter"
-               :class ["bg-[#3651c4]" "text-white"]
+     (map (fn [label value]
+            [:div {:class ["relative" "group"]}
+             [:button {:class ["w-full" "h-full" "bg-slate-300" "rounded" "hover:bg-blue-900" "hover:text-white"] :on {:click [:display/update value]}} label]
+             [:div {:class ["absolute" "bottom-full" "mb-2" "left-1/2" "w-full"
+                            "transform" "-translate-x-1/2" "bg-gray-800"
+                            "text-white" "text-xs" "rounded" "py-1" "px-2"
+                            "opacity-0" "group-hover:opacity-100"
+                            "transition-opacity" "duration-200"]} (str label " = " value)]]) ["M1" "M2" "M3"] history)
+     (map #(vector :button {:class "bg-slate-100" :on {:click [:display/update %]}} %) numbers)
+     [:button {:class ["bg-[#3651c4]" "text-white"]
                :on {:click [:api/calculate]}} "="]]))
 
 (ra/defalias keypad
-  []
+  [data]
   [:div
    {:class ["bg-white" "text-xl" "w-full" "p-1" "rounded-lg" "grid" "grid-cols-12"]}
-   [numeric-keys]
+   [numeric-keys data]
    [symbol-keys]])
 
 (ra/defalias calculator
@@ -90,7 +91,7 @@
   [:div
    {:class ["flex" "flex-col" "items-center" "gap-3" "font-bold"]}
    [display data]
-   [keypad]])
+   [keypad data]])
 
 ;; Views
 
@@ -105,7 +106,7 @@
 
 ;; Entry Point
 
-(defn render [root]
+(defn- render [root]
   (add-watch state :display
              (fn [_ _ _ new-state]
                (r/render root (index new-state))))
