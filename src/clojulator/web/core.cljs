@@ -1,26 +1,23 @@
 (ns clojulator.web.core
   (:require
-   [clojulator.calculator.core :refer [calculate]]
-   [replicant.alias :refer [defalias]]
+   [clojulator.calculator.core :as calc]
+   [replicant.alias :as ra]
    [replicant.dom :as r]))
 
 ;; Private State
-(defonce ^:private state (atom {:history (atom [])
-                                :last-result nil
+(defonce ^:private state (atom {:history []
+                                :value nil
                                 :display ""
                                 :should-append? true}))
 
 (defn handle-calculate
   [db]
   (let [expression (:display db)
-        history (:history db)
-        [result value] (calculate expression history)
-        new-state (-> db
-                      (assoc :should-append? false)
-                      (assoc :display (str value)))]
-    (if (= result :ok)
-      (assoc new-state :last-result (str "Ans = " value))
-      new-state)))
+        new-db (calc/calculate db expression)
+        {:keys [value error]} new-db]
+    (-> new-db
+        (assoc :should-append? false)
+        (assoc :display (if-not error value error)))))
 
 (defn- update-display
   [db value]
@@ -39,26 +36,26 @@
 
 ;; Components
 
-(defalias header
+(ra/defalias header
   []
   [:div.header
    {:class "text-center"}
    [:h1 "Welcome to Clojulator!"]
    [:h4 "A calculator written in Clojure"]])
 
-(defalias display
-  [{:keys [last-result display]}]
+(ra/defalias display
+  [{:keys [value display]}]
   [:div
    {:class ["w-full" "h-16" "sm:h-28" "bg-white" "border-2" "border-blue-400" "rounded-lg" "mt-5" "md:mt-0" "flex" "flex-col" "justify-evenly" "items-end" "pr-2" "border-blue-500" "text-right"]}
    [:div
     [:div
      {:class "text-slate-600/50"
-      :id "previous-expression"} last-result]
+      :id "previous-expression"} (when value (str "Ans = " value))]
     [:div
      {:id "current-display"
       :class ["text-2xl" "md:text-3xl" "font-semibold"]} display]]])
 
-(defalias symbol-keys
+(ra/defalias symbol-keys
   []
   (let [operators ["-" "+" "/" "*" "%" "^" "(" ")"]]
     [:div
@@ -69,7 +66,7 @@
      (map #(vector :button {:key % :class "bg-slate-300"
                             :on {:click [:display/update %]}} %) operators)]))
 
-(defalias numeric-keys
+(ra/defalias numeric-keys
   []
   (let [numbers [7 8 9 4 5 6 1 2 3 0 "."]
         last-three-expressions ["p1" "p2" "p3"]]
@@ -81,14 +78,14 @@
                :class ["bg-[#3651c4]" "text-white"]
                :on {:click [:api/calculate]}} "="]]))
 
-(defalias keypad
+(ra/defalias keypad
   []
   [:div
    {:class ["bg-white" "text-xl" "w-full" "p-1" "rounded-lg" "grid" "grid-cols-12"]}
    [numeric-keys]
    [symbol-keys]])
 
-(defalias calculator
+(ra/defalias calculator
   [data]
   [:div
    {:class ["flex" "flex-col" "items-center" "gap-3" "font-bold"]}

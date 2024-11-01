@@ -1,5 +1,4 @@
-(ns clojulator.calculator.evaluator
-  (:require [clojulator.calculator.history :refer [repl1 repl2 repl3]]))
+(ns clojulator.calculator.evaluator)
 
 (declare map-eval-reduce)
 
@@ -7,12 +6,12 @@
   "Polymorphic evaluator for AST nodes"
   (fn [node _history] (first node)))
 
-(defmethod evaluate :node/Env [node history]
+(defmethod evaluate :node/Env [node [p1 p2 p3]]
   (let [var-name (second node)]
     (case var-name
-      "p1" (repl1 history)
-      "p2" (repl2 history)
-      "p3" (repl3 history)
+      "p1" p1
+      "p2" p2
+      "p3" p3
       (let [error-msg (str "Unknown evnironment variable: " var-name)]
         (throw #?(:clj (Exception. error-msg)
                   :cljs (js/Error. error-msg)))))))
