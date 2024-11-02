@@ -22,9 +22,6 @@
                          "p2" p2
                          "p3" p3))
            :node/Group (first children)
-          ;; Special case for unary operators
-           (if (= 1 (count children))
-             (op (first children))
-             (apply op children))))
+           (apply op children)))
        node))
    ast))
