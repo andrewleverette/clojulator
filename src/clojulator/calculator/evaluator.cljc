@@ -2,43 +2,29 @@
 
 (declare map-eval-reduce)
 
-(defmulti evaluate
-  "Polymorphic evaluator for AST nodes"
-  (fn [node _history] (first node)))
-
-(defmethod evaluate :node/Env [node [p1 p2 p3]]
-  (let [var-name (second node)]
-    (case var-name
-      "p1" p1
-      "p2" p2
-      "p3" p3
-      (let [error-msg (str "Unknown evnironment variable: " var-name)]
-        (throw #?(:clj (Exception. error-msg)
-                  :cljs (js/Error. error-msg)))))))
-
-(defmethod evaluate :node/Number [node _history] (second node))
-
-(defmethod evaluate :node/Group
+(defn evaluate
+  "Evaluates an AST node and returns the result."
   [node history]
-  (-> node
-      second
-      (evaluate history)))
-
-(defmethod evaluate :node/Caret [node history] (map-eval-reduce history Math/pow (rest node)))
-
-(defmethod evaluate :node/Star [node history] (map-eval-reduce history * (rest node)))
-
-(defmethod evaluate :node/Slash [node history] (map-eval-reduce history / (rest node)))
-
-(defmethod evaluate :node/Modulo [node history] (map-eval-reduce history mod (rest node)))
-
-(defmethod evaluate :node/Plus [node history] (map-eval-reduce history + (rest node)))
-
-(defmethod evaluate :node/Minus [node history]
-  (let [remaining (rest node)]
-    (if (= 1 (count remaining))
-      (- (evaluate (first remaining) history))
-      (map-eval-reduce history - remaining))))
+  (let [node-type (first node)
+        op ({:node/Plus +
+             :node/Minus -
+             :node/Star *
+             :node/Slash /
+             :node/Caret Math/pow
+             :node/Modulo mod}
+            node-type)]
+    (case node-type
+      :node/Number (second node)
+      :node/Env (let [[p1 p2 p3] history]
+                  (case (second node)
+                    "p1" p1
+                    "p2" p2
+                    "p3" p3))
+      :node/Group (evaluate (second node) history)
+      ;; Special case for unary operators
+      (if (= 1 (count (rest node)))
+        (op (evaluate (first (rest node)) history))
+        (map-eval-reduce history op (rest node))))))
 
 (defn map-eval-reduce
   "Helper function for mapping and reducing 
