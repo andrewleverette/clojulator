@@ -1,61 +1,19 @@
 (ns clojulator.web.core
   (:require
    [clojulator.calculator.core :as calc]
+   [clojulator.web.validation :as v]
    [replicant.alias :as ra]
    [replicant.dom :as r]))
 
 ;; Private State
 (defonce ^:private state (atom {:state/history [0 0 0] ; Default to zero for memory values
+                                :state/last-expression nil
                                 :state/value nil
                                 :state/display ""
                                 :state/validation-state :validation/start
                                 :state/alert {:alert/message ""
                                               :alert/visble false
                                               :alert/timeout-id nil}}))
-
-;; User Input Validation
-(defn- validate-user-input
-  "Given an input, returns the next validation state."
-  [{:state/keys [validation-state display]} input]
-  (case validation-state
-    :validation/start
-    (cond
-      (= input "(")   :validation/after-open-paren
-      (= input "-")   :validation/after-unary-operator
-      (number? input) :validation/after-number
-      :else           :validation/invalid)
-    :validation/after-number
-    (cond
-      (#{"+" "-" "*" "/" "^" "%"} input)                :validation/after-operator
-      (= input ")")                                     :validation/after-close-paren
-      (and (= input ".") (not (re-find #"\." display))) :validation/after-decimal
-      (number? input)                                   :validation/after-number
-      :else                                             :validation/invalid)
-    :validation/after-decimal
-    (if (number? input)
-      :validation/after-number
-      :validation/invalid)
-    :validation/after-unary-operator
-    (cond
-      (= input "(")   :validation/after-open-paren
-      (number? input) :validation/after-number
-      :else           :validation/invalid)
-    :validation/after-operator
-    (cond
-      (= input "(")   :validation/after-open-paren
-      (= input "-")   :validation/after-unary-operator
-      (number? input) :validation/after-number)
-    :validation/after-open-paren
-    (cond
-      (= input "-")        :validation/after-unary-operator
-      (number? input)      :validation/after-number
-      (= input "(")        :validation/after-open-paren
-      :else                :validation/invalid)
-    :validation/after-close-paren
-    (if (#{"+" "-" "*" "/" "^" "%"} input)
-      :validation/after-operator
-      :validation/invalid)
-    :validation/invalid))
 
 ;; Event Handlers
 (defn- trigger-alert!
@@ -75,14 +33,20 @@
   (let [expression (:state/display db)
         new-db (calc/calculate db expression)
         {:state/keys [value error]} new-db]
-    (-> new-db
-        (assoc :state/display (if-not error value error))
-        (assoc :state/validation-state :validation/start))))
+    (if-not error
+      (-> new-db
+          (assoc :state/display value
+                 :state/last-expression expression
+                 :state/validation-state :validation/after-number))
+      (-> new-db
+          (assoc :state/display error
+                 :state/last-expression nil
+                 :state/validation-state :validation/start)))))
 
 (defn- handle-input!
   [db input]
   (let [current-validation-state (:state/validation-state db)
-        next-validation-state (validate-user-input db input)
+        next-validation-state (v/validate-user-input db input)
         update-display-fn (if (= current-validation-state :validation/start)
                             (fn [_] (str input))
                             str)]
@@ -94,9 +58,10 @@
 
 (defn- handle-clear
   [db]
-  (-> db
-      (assoc :state/display "")
-      (assoc :state/validation-state :validation/start)))
+  (assoc db
+         :state/display ""
+         :state/last-expression nil
+         :state/validation-state :validation/start))
 
 ;; Dispatcher
 
@@ -129,16 +94,19 @@
    [:h4 "A calculator written in Clojure"]])
 
 (ra/defalias display
-  [{:state/keys [value display]}]
+  [{:state/keys [last-expression value display]}]
   [:div
    {:class ["w-full" "h-16" "sm:h-28" "bg-white" "border-2" "border-blue-400" "rounded-lg" "mt-5" "md:mt-0" "flex" "flex-col" "justify-evenly" "items-end" "pr-2" "border-blue-500" "text-right"]}
    [:div
     [:div
      {:class "text-slate-600/50"
-      :id "previous-expression"} (when value (str "Ans = " value))]
-    [:div
-     {:id "current-display"
-      :class ["text-2xl" "md:text-3xl" "font-semibold"]} display]]])
+      :id "previous-expression"} (cond
+                                   last-expression (str last-expression " =")
+                                   value (str "Ans = " value)
+                                   :else "")]]
+   [:div
+    {:id "current-display"
+     :class ["text-2xl" "md:text-3xl" "font-semibold"]} display]])
 
 (ra/defalias symbol-keys
   []
