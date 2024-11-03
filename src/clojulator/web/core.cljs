@@ -5,21 +5,98 @@
    [replicant.dom :as r]))
 
 ;; Private State
-(defonce ^:private state (atom {:history [0 0 0] ; Default to zero for memory values
-                                :value nil
-                                :display ""}))
+(defonce ^:private state (atom {:state/history [0 0 0] ; Default to zero for memory values
+                                :state/value nil
+                                :state/display ""
+                                :state/validation-state :validation/start
+                                :state/alert {:alert/message ""
+                                              :alert/visble false
+                                              :alert/timeout-id nil}}))
+
+;; User Input Validation
+(defn- validate-user-input
+  "Given an input, returns the next validation state."
+  [{:state/keys [validation-state display]} input]
+  (case validation-state
+    :validation/start
+    (cond
+      (= input "(")   :validation/after-open-paren
+      (= input "-")   :validation/after-unary-operator
+      (number? input) :validation/after-number
+      :else           :validation/invalid)
+    :validation/after-number
+    (cond
+      (#{"+" "-" "*" "/" "^" "%"} input)                :validation/after-operator
+      (= input ")")                                     :validation/after-close-paren
+      (and (= input ".") (not (re-find #"\." display))) :validation/after-decimal
+      (number? input)                                   :validation/after-number
+      :else                                             :validation/invalid)
+    :validation/after-decimal
+    (if (number? input)
+      :validation/after-number
+      :validation/invalid)
+    :validation/after-unary-operator
+    (cond
+      (= input "(")   :validation/after-open-paren
+      (number? input) :validation/after-number
+      :else           :validation/invalid)
+    :validation/after-operator
+    (cond
+      (= input "(")   :validation/after-open-paren
+      (= input "-")   :validation/after-unary-operator
+      (number? input) :validation/after-number)
+    :validation/after-open-paren
+    (cond
+      (= input "-")        :validation/after-unary-operator
+      (number? input)      :validation/after-number
+      (= input "(")        :validation/after-open-paren
+      :else                :validation/invalid)
+    :validation/after-close-paren
+    (if (#{"+" "-" "*" "/" "^" "%"} input)
+      :validation/after-operator
+      :validation/invalid)
+    :validation/invalid))
 
 ;; Event Handlers
+(defn- trigger-alert!
+  [db message]
+  (update db :state/alert
+          (fn [alert alert-message]
+            (when-let [timeout-id (:alert/timeout-id alert)]
+              (js/clearTimeout timeout-id))
+            (let [new-timeout-id (js/setTimeout (fn [] (swap! state assoc-in [:state/alert :alert/visible] false)) 5000)]
+              {:alert/message alert-message
+               :alert/visible true
+               :alert/timeout-id new-timeout-id}))
+          message))
+
 (defn- handle-calculate
   [db]
-  (let [expression (:display db)
+  (let [expression (:state/display db)
         new-db (calc/calculate db expression)
-        {:keys [value error]} new-db]
-    (assoc new-db :display (if-not error value error))))
+        {:state/keys [value error]} new-db]
+    (-> new-db
+        (assoc :state/display (if-not error value error))
+        (assoc :state/validation-state :validation/start))))
 
-(defn- update-display
-  [db value]
-  (update db :display str value))
+(defn- handle-input!
+  [db input]
+  (let [current-validation-state (:state/validation-state db)
+        next-validation-state (validate-user-input db input)
+        update-display-fn (if (= current-validation-state :validation/start)
+                            (fn [_] (str input))
+                            str)]
+    (if (not= next-validation-state :validation/invalid)
+      (-> db
+          (assoc :state/validation-state next-validation-state)
+          (update :state/display update-display-fn input))
+      (trigger-alert! db (str "Input '" input "' resulted in an invalid expression.")))))
+
+(defn- handle-clear
+  [db]
+  (-> db
+      (assoc :state/display "")
+      (assoc :state/validation-state :validation/start)))
 
 ;; Dispatcher
 
@@ -28,10 +105,21 @@
    (let [[op data] action]
      (case op
        :api/calculate (swap! state handle-calculate)
-       :display/clear (swap! state assoc :display "")
-       :display/update (swap! state update-display data)))))
+       :display/clear (swap! state handle-clear)
+       :display/update (swap! state handle-input! data)))))
 
 ;; Components
+
+(ra/defalias user-alert
+  [{:state/keys [alert]}]
+  (println (:alert/message alert))
+  [:div
+   {:class ["fixed" "bottom-1/4" "left-1/2" "transform" "-translate-x-1/2" "mb-4"
+            "bg-red-100" "border-2" "border-red-500" "text-red-700"
+            "px-4" "py-3" "rounded-lg" "shadow-lg"]
+    :role "alert"}
+   [:p {:class "font-bold"} "Error!"]
+   [:p {:class "text-sm"} (:alert/message alert)]])
 
 (ra/defalias header
   []
@@ -41,7 +129,7 @@
    [:h4 "A calculator written in Clojure"]])
 
 (ra/defalias display
-  [{:keys [value display]}]
+  [{:state/keys [value display]}]
   [:div
    {:class ["w-full" "h-16" "sm:h-28" "bg-white" "border-2" "border-blue-400" "rounded-lg" "mt-5" "md:mt-0" "flex" "flex-col" "justify-evenly" "items-end" "pr-2" "border-blue-500" "text-right"]}
    [:div
@@ -63,7 +151,7 @@
                             :on {:click [:display/update %]}} %) operators)]))
 
 (ra/defalias numeric-keys
-  [{:keys [history]}]
+  [{:state/keys [history]}]
   (let [numbers [7 8 9 4 5 6 1 2 3 0 "."]]
     [:div
      {:class ["number" "mr-2" "col-span-9" "grid" "grid-cols-3" "gap-2" "[&>*:hover]:bg-blue-900" "[&>*]:rounded" "[&>*:hover]:text-white" "[&>*:active]:scale-90"]}
@@ -102,13 +190,15 @@
    [:main
     {:class ["w-full" "max-w-lg" "select-none" "px-4" "md:px-0"]}
     [header]
-    [calculator data]]])
+    [calculator data]
+    (when (get-in data [:state/alert :alert/visible]) [user-alert data])]])
 
 ;; Entry Point
 
 (defn- render [root]
-  (add-watch state :display
+  (add-watch state :state/display
              (fn [_ _ _ new-state]
+               (println new-state)
                (r/render root (index new-state))))
   (r/render root (index @state)))
 
