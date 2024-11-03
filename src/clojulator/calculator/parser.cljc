@@ -1,5 +1,4 @@
-(ns clojulator.calculator.parser
-  (:require [clojulator.calculator.token :as tok]))
+(ns clojulator.calculator.parser)
 
 (declare expression)
 
@@ -9,7 +8,7 @@
                   :cljs (js/Error. error-msg)))))
   ([tokens]
    (if-let [token (first tokens)]
-     (let [error-msg (str "Unexpected token '" (tok/lexeme token) "' at position " (tok/pos token))]
+     (let [error-msg (str "Unexpected token '" (:token/lexeme token) "' at position " (:token/pos token))]
        (throw #?(:clj (Exception. error-msg)
                  :cljs (js/Error. error-msg))))
      (let [error-msg "Unexpected end of input"]
@@ -21,7 +20,7 @@
   the matcher, otherwise nil."
   [tokens matcher]
   (when (seq tokens)
-    (-> tokens first tok/token-type matcher)))
+    (-> tokens first :token/type matcher)))
 
 (defn- group
   "Group rule: ( <expression> )
@@ -42,7 +41,7 @@
   :Repl/*1, :Repl/*2, or :Repl/*3."
   [tokens]
   (if (match tokens #{:token/*1 :token/*2 :token/*3})
-    {:node [:node/Env (tok/lexeme (first tokens))] :remaining (rest tokens)}
+    {:node [:node/Env (:token/lexeme (first tokens))] :remaining (rest tokens)}
     (parser-error tokens)))
 
 (defn- number
@@ -50,7 +49,7 @@
   Adds a number literal to the AST if the next token matches :Number"
   [tokens]
   (if (match tokens #{:token/Number})
-    {:node [:node/Number (tok/literal (first tokens))] :remaining (rest tokens)}
+    {:node [:node/Number (:token/literal (first tokens))] :remaining (rest tokens)}
     (parser-error tokens)))
 
 (defn- primary

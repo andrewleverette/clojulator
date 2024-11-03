@@ -74,7 +74,7 @@
          index 0
          tokens []]
     (if-let [token (scan-token chars index)]
-      (let [delta (- (+ (tok/pos token) (tok/length token)) index)]
+      (let [delta (- (+ (:token/pos token) (:token/len token)) index)]
         (recur
          (drop delta chars)
          (+ index delta)

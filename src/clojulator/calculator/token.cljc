@@ -39,23 +39,3 @@
   (when-let [token-type (symbol-tokens s)]
     (let [lexeme (str s)]
       (token token-type lexeme pos (count lexeme)))))
-
-(defn token-type
-  [token]
-  (:token/type token))
-
-(defn lexeme
-  [token]
-  (:token/lexeme token))
-
-(defn literal
-  [token]
-  (:token/literal token))
-
-(defn pos
-  [token]
-  (:token/pos token))
-
-(defn length
-  [token]
-  (:token/len token))
