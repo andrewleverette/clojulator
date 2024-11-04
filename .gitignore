@@ -7,4 +7,6 @@ output.calva-repl
 codealike.json
 node_modules/
 
+cljs-test-runner-out/
+
 resources/public/js
