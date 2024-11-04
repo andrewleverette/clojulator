@@ -22,7 +22,7 @@
           (fn [alert alert-message]
             (when-let [timeout-id (:alert/timeout-id alert)]
               (js/clearTimeout timeout-id))
-            (let [new-timeout-id (js/setTimeout (fn [] (swap! state assoc-in [:state/alert :alert/visible] false)) 5000)]
+            (let [new-timeout-id (js/setTimeout (fn [] (swap! state assoc-in [:state/alert :alert/visible] false)) 3000)]
               {:alert/message alert-message
                :alert/visible true
                :alert/timeout-id new-timeout-id}))
@@ -77,11 +77,10 @@
 
 (ra/defalias user-alert
   [{:state/keys [alert]}]
-  (println (:alert/message alert))
   [:div
    {:class ["fixed" "bottom-1/4" "left-1/2" "transform" "-translate-x-1/2" "mb-4"
             "bg-red-100" "border-2" "border-red-500" "text-red-700"
-            "px-4" "py-3" "rounded-lg" "shadow-lg"]
+            "px-4" "py-3" "rounded-lg" "shadow-lg" "transition" "ease-linear" "duration-500"]
     :role "alert"}
    [:p {:class "font-bold"} "Error!"]
    [:p {:class "text-sm"} (:alert/message alert)]])
@@ -159,7 +158,10 @@
     {:class ["w-full" "max-w-lg" "select-none" "px-4" "md:px-0"]}
     [header]
     [calculator data]
-    (when (get-in data [:state/alert :alert/visible]) [user-alert data])]])
+    (when (get-in data [:state/alert :alert/visible])
+      [user-alert data
+       {:replicant/mounting {:style {:bottom "-100%"}}
+        :replicant/unmounting {:style {:bottom "-100%"}}}])]])
 
 ;; Entry Point
 
