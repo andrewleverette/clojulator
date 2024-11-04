@@ -21,4 +21,4 @@
           (dissoc :state/error)))
     (catch #?(:clj Exception
               :cljs js/Error) e
-      (assoc state :error (ex-message e)))))
+      (assoc state :state/error (ex-message e)))))
