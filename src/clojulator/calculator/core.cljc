@@ -10,15 +10,15 @@
   history object with the result."
   [state expression]
   (try
-    (let [[p1 p2 _] (:history state)
+    (let [[p1 p2 _] (:state/history state)
           value (-> expression
                     s/tokenize
                     p/parse
-                    (ev/evaluate (:history state)))]
+                    (ev/evaluate (:state/history state)))]
       (-> state
-          (assoc :value value)
-          (assoc :history [value p1 p2])
-          (dissoc :error)))
+          (assoc :state/value value
+                 :state/history [value p1 p2])
+          (dissoc :state/error)))
     (catch #?(:clj Exception
               :cljs js/Error) e
-      (assoc state :error (ex-message e)))))
+      (assoc state :state/error (ex-message e)))))

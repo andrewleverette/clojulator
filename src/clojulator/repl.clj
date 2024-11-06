@@ -31,6 +31,6 @@
     (let [input (read-line)]
       (if (should-quit? input)
         (exit-repl!)
-        (let [{:keys [value error history]} (calc/calculate {:history history} input)]
+        (let [{:state/keys [value error history]} (calc/calculate {:state/history history} input)]
           (reporter/report (if value [:ok value] [:error error]))
           (recur history))))))
