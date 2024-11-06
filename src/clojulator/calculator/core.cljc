@@ -16,8 +16,8 @@
                     p/parse
                     (ev/evaluate (:state/history state)))]
       (-> state
-          (assoc :state/value value)
-          (assoc :state/history [value p1 p2])
+          (assoc :state/value value
+                 :state/history [value p1 p2])
           (dissoc :state/error)))
     (catch #?(:clj Exception
               :cljs js/Error) e

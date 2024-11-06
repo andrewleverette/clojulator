@@ -2,12 +2,16 @@
   (:require
    [clojulator.calculator.core :as calc]
    [clojulator.web.validation :as v]
-   [replicant.alias :as ra]
-   [replicant.dom :as r]))
+   [replicant.alias :as r-alias]
+   [replicant.core :as r-core]
+   [replicant.dom :as r-dom]))
 
 (declare render!)
+(declare dispatch-event)
 
 ;; Private State
+(defonce ^:private el! (atom nil))
+
 (defonce ^:private state! (atom {:state/history [0 0 0] ; Default to zero for memory values
                                  :state/last-expression nil
                                  :state/value nil
@@ -22,7 +26,7 @@
   [timeout-id timeout-value event]
   (when timeout-id
     (js/clearTimeout timeout-id))
-  (let [new-timeout-id (js/setTimeout (fn [] (apply swap! state! assoc-in event)) timeout-value)]
+  (let [new-timeout-id (js/setTimeout (fn [] (dispatch-event @el! event)) timeout-value)]
     [[:state/alert :alert/timeout-id] new-timeout-id]))
 
 (defn- handle-calculate
@@ -61,7 +65,7 @@
        [:fx/timeout
         (get-in db [:state/alert :alert/timeout-id])
         3000
-        [[:state/alert :alert/visisble] false]]])))
+        [[:db/assoc :state/alert {:alert/visible false}]]]])))
 
 (defn- handle-clear
   []
@@ -76,12 +80,24 @@
     (case op
       :api/calculate (handle-calculate db)
       :display/clear (handle-clear)
-      :display/update (handle-input db input))))
+      :display/update (handle-input db input)
+      action)))
+
+;; Dispatch
+
+(defn dispatch-event
+  "Dispatch event data outside of Replicant actions"
+  [e data]
+  (let [el @el!]
+    (if (and r-core/*dispatch* el)
+      (if (get-in @r-dom/state [el :rendering?])
+        (js/requestAnimationFrame #(r-core/*dispatch* e data))
+        (r-core/*dispatch* e data))
+      (throw (js/Error. "Cannot dispatch custom event data without a global event handler. Call replicant.core/set-dispatch!")))))
 
 (defn- event-handler
   [_ action]
   (doseq [[id & args] (process-action @state! action)]
-    (println "Event: " id "\nArgs: " args)
     (case id
       :db/assoc (apply swap! state! assoc args)
       :fx/timeout (->> args
@@ -91,7 +107,7 @@
 
 ;; Components
 
-(ra/defalias user-alert
+(r-alias/defalias user-alert
   [{:state/keys [alert]}]
   [:div
    {:class ["fixed" "bottom-1/4" "left-1/2" "transform" "-translate-x-1/2" "mb-4"
@@ -101,14 +117,14 @@
    [:p {:class "font-bold"} "Error!"]
    [:p {:class "text-sm"} (:alert/message alert)]])
 
-(ra/defalias header
+(r-alias/defalias header
   []
   [:div.header
    {:class "text-center"}
    [:h1 "Welcome to Clojulator!"]
    [:h4 "A calculator written in Clojure"]])
 
-(ra/defalias display
+(r-alias/defalias display
   [{:state/keys [last-expression value display]}]
   [:div
    {:class ["w-full" "h-16" "sm:h-28" "bg-white" "border-2" "border-blue-400" "rounded-lg" "mt-5" "md:mt-0" "flex" "flex-col" "justify-evenly" "items-end" "pr-2" "border-blue-500" "text-right"]}
@@ -123,7 +139,7 @@
     {:id "current-display"
      :class ["text-2xl" "md:text-3xl" "font-semibold"]} display]])
 
-(ra/defalias symbol-keys
+(r-alias/defalias symbol-keys
   []
   (let [operators ["-" "+" "/" "*" "%" "^" "(" ")"]]
     [:div
@@ -133,7 +149,7 @@
      (map #(vector :button {:class "bg-slate-300"
                             :on {:click [:display/update %]}} %) operators)]))
 
-(ra/defalias numeric-keys
+(r-alias/defalias numeric-keys
   [{:state/keys [history]}]
   (let [numbers [7 8 9 4 5 6 1 2 3 0 "."]]
     [:div
@@ -150,14 +166,14 @@
      [:button {:class ["bg-[#3651c4]" "text-white"]
                :on {:click [:api/calculate]}} "="]]))
 
-(ra/defalias keypad
+(r-alias/defalias keypad
   [data]
   [:div
    {:class ["bg-white" "text-xl" "w-full" "p-1" "rounded-lg" "grid" "grid-cols-12"]}
    [numeric-keys data]
    [symbol-keys]])
 
-(ra/defalias calculator
+(r-alias/defalias calculator
   [data]
   [:div
    {:class ["flex" "flex-col" "items-center" "gap-3" "font-bold"]}
@@ -183,8 +199,9 @@
 
 (defn- render! [state]
   (let [root (js/document.getElementById "app")]
-    (r/render root (index state))))
+    (reset! el! root)
+    (r-dom/render @el! (index state))))
 
 (defn ^:export main []
-  (r/set-dispatch! event-handler)
+  (r-dom/set-dispatch! event-handler)
   (render! @state!))
