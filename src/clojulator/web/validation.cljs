@@ -15,6 +15,12 @@
     (number? input)                                   :validation/after-number
     :else                                             :validation/invalid))
 
+(defn- after-calculate-state [input]
+  (cond
+    (#{"+" "-" "*" "/" "^" "%"} input) :validation/after-operator
+    (number? input)                    :validation/after-number
+    :else                              :validation/invalid))
+
 (defn- after-decimal-state [input]
   (if (number? input)
     :validation/after-number
@@ -48,6 +54,7 @@
 (def state-transitions
   {:validation/start            start-state
    :validation/after-number     after-number-state
+   :validation/after-calculate  after-calculate-state
    :validation/after-decimal    after-decimal-state
    :validation/after-unary-operator after-unary-operator-state
    :validation/after-operator   after-operator-state

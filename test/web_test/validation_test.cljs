@@ -78,6 +78,18 @@
            (validate-user-input {:state/validation-state :validation/after-number
                                  :state/display "5"} "invalid"))))
 
+  (testing "Transition after-calculate state"
+    (is (true? (every? #(= :validation/after-operator %)
+                       (map #(validate-user-input {:state/validation-state :validation/after-number
+                                                   :state/display "5"} %)
+                            ["+" "-" "*" "/" "^" "%"]))))
+    (is (= :validation/after-number
+           (validate-user-input {:state/validation-state :validation/after-calculate
+                                 :state/display "5"} 5)))
+    (is (= :validation/invalid
+           (validate-user-input {:state/validation-state :validation/after-calculate
+                                 :state/display "5"} "invalid"))))
+
   (testing "Transition from after-operator state"
     (is (= :validation/after-open-paren
            (validate-user-input {:state/validation-state :validation/after-operator

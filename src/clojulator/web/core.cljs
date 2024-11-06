@@ -5,73 +5,89 @@
    [replicant.alias :as ra]
    [replicant.dom :as r]))
 
+(declare render!)
+
 ;; Private State
-(defonce ^:private state (atom {:state/history [0 0 0] ; Default to zero for memory values
-                                :state/last-expression nil
-                                :state/value nil
-                                :state/display ""
-                                :state/validation-state :validation/start
-                                :state/alert {:alert/message ""
-                                              :alert/visble false
-                                              :alert/timeout-id nil}}))
+(defonce ^:private state! (atom {:state/history [0 0 0] ; Default to zero for memory values
+                                 :state/last-expression nil
+                                 :state/value nil
+                                 :state/display ""
+                                 :state/validation-state :validation/start
+                                 :state/alert {:alert/message ""
+                                               :alert/visble false
+                                               :alert/timeout-id nil}}))
 
 ;; Event Handlers
 (defn- trigger-alert!
-  [db message]
-  (update db :state/alert
-          (fn [alert alert-message]
-            (when-let [timeout-id (:alert/timeout-id alert)]
-              (js/clearTimeout timeout-id))
-            (let [new-timeout-id (js/setTimeout (fn [] (swap! state assoc-in [:state/alert :alert/visible] false)) 3000)]
-              {:alert/message alert-message
-               :alert/visible true
-               :alert/timeout-id new-timeout-id}))
-          message))
+  [timeout-id timeout-value event]
+  (when timeout-id
+    (js/clearTimeout timeout-id))
+  (let [new-timeout-id (js/setTimeout (fn [] (apply swap! state! assoc-in event)) timeout-value)]
+    [[:state/alert :alert/timeout-id] new-timeout-id]))
 
 (defn- handle-calculate
   [db]
   (let [expression (:state/display db)
         new-db (calc/calculate db expression)
-        {:state/keys [value error]} new-db]
+        {:state/keys [value error history]} new-db]
     (if-not error
-      (-> new-db
-          (assoc :state/display value
-                 :state/last-expression expression
-                 :state/validation-state :validation/after-number))
-      (-> new-db
-          (assoc :state/display error
-                 :state/last-expression nil
-                 :state/validation-state :validation/start)))))
+      [[:db/assoc
+        :state/display (str value)
+        :state/last-expression expression
+        :state/history history
+        :state/validation-state :validation/after-calculate]]
+      [[:db/assoc
+        :state/display error
+        :state/last-expression nil
+        :state/validation-state :validation/start]])))
 
-(defn- handle-input!
+(defn- handle-input
   [db input]
   (let [current-validation-state (:state/validation-state db)
         next-validation-state (v/validate-user-input db input)
-        update-display-fn (if (= current-validation-state :validation/start)
-                            (fn [_] (str input))
-                            str)]
+        new-display (if (or (= current-validation-state :validation/start)
+                            (and (= current-validation-state :validation/after-calculate)
+                                 (number? input)))
+                      (str input)
+                      (str (:state/display db) input))]
     (if (not= next-validation-state :validation/invalid)
-      (-> db
-          (assoc :state/validation-state next-validation-state)
-          (update :state/display update-display-fn input))
-      (trigger-alert! db (str "Input '" input "' resulted in an invalid expression.")))))
+      [[:db/assoc
+        :state/validation-state next-validation-state
+        :state/display new-display]]
+      [[:db/assoc
+        :state/alert
+        {:alert/message (str "Input '" input "' resulted in an invalid expression.")
+         :alert/visible true}]
+       [:fx/timeout
+        (get-in db [:state/alert :alert/timeout-id])
+        3000
+        [[:state/alert :alert/visisble] false]]])))
 
 (defn- handle-clear
-  [db]
-  (assoc db
-         :state/display ""
-         :state/last-expression nil
-         :state/validation-state :validation/start))
+  []
+  [[:db/assoc
+    :state/display ""
+    :state/last-expression nil
+    :state/validation-state :validation/start]])
 
-;; Dispatcher
+(defn- process-action
+  [db action]
+  (let [[op input] action]
+    (case op
+      :api/calculate (handle-calculate db)
+      :display/clear (handle-clear)
+      :display/update (handle-input db input))))
 
-(r/set-dispatch!
- (fn [_ action]
-   (let [[op data] action]
-     (case op
-       :api/calculate (swap! state handle-calculate)
-       :display/clear (swap! state handle-clear)
-       :display/update (swap! state handle-input! data)))))
+(defn- event-handler
+  [_ action]
+  (doseq [[id & args] (process-action @state! action)]
+    (println "Event: " id "\nArgs: " args)
+    (case id
+      :db/assoc (apply swap! state! assoc args)
+      :fx/timeout (->> args
+                       (apply trigger-alert!)
+                       (apply swap! state! assoc-in))))
+  (render! @state!))
 
 ;; Components
 
@@ -165,13 +181,10 @@
 
 ;; Entry Point
 
-(defn- render [root]
-  (add-watch state :state/display
-             (fn [_ _ _ new-state]
-               (println new-state)
-               (r/render root (index new-state))))
-  (r/render root (index @state)))
+(defn- render! [state]
+  (let [root (js/document.getElementById "app")]
+    (r/render root (index state))))
 
 (defn ^:export main []
-  (let [root (js/document.getElementById "app")]
-    (render root)))
+  (r/set-dispatch! event-handler)
+  (render! @state!))
