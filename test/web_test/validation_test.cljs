@@ -83,6 +83,9 @@
                        (map #(validate-user-input {:state/validation-state :validation/after-number
                                                    :state/display "5"} %)
                             ["+" "-" "*" "/" "^" "%"]))))
+    (is (= :validation/after-open-paren
+           (validate-user-input {:state/validation-state :validation/after-calculate
+                                 :state/display "5"} "(")))
     (is (= :validation/after-number
            (validate-user-input {:state/validation-state :validation/after-calculate
                                  :state/display "5"} 5)))

@@ -18,6 +18,7 @@
 (defn- after-calculate-state [input]
   (cond
     (#{"+" "-" "*" "/" "^" "%"} input) :validation/after-operator
+    (= input "(")                      :validation/after-open-paren
     (number? input)                    :validation/after-number
     :else                              :validation/invalid))
 
