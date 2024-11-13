@@ -1,3 +1,5 @@
+;; copyright (c) 2024, Andrew Leverette, all rights reserved
+
 (ns clojulator.calculator.core
   (:require
    [clojulator.calculator.evaluator :as ev]

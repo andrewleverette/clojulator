@@ -1,3 +1,5 @@
+;; copyright (c) 2024, Andrew Leverette, all rights reserved
+ 
 (ns clojulator.repl
   (:gen-class)
   (:require [clojulator.calculator.core :as calc]
