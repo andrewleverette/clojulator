@@ -1,6 +1,10 @@
 ;; copyright (c) 2024, Andrew Leverette, all rights reserved
 
 (ns clojulator.calculator.evaluator
+  "Evaluator namesacpace for evaluating ASTs.
+  
+  Provides a single function, `evaluate`, to that handles
+  trying to convert an AST into a concrete value"
   (:require [clojure.walk :as walk]))
 
 (defn evaluate

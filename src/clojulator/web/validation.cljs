@@ -1,6 +1,10 @@
 ;; copyright (c) 2024, Andrew Leverette, all rights reserved
 
-(ns clojulator.web.validation)
+(ns clojulator.web.validation
+  "Validation namespace for validating user input.
+  
+  Provides functionality to validate user input and determine
+  the next valid input state.")
 
 (defn- start-state [input]
   (cond
@@ -55,6 +59,7 @@
     :validation/invalid))
 
 (def state-transitions
+  "Mapping of validation states to their transition functions."
   {:validation/start            start-state
    :validation/after-number     after-number-state
    :validation/after-calculate  after-calculate-state

@@ -1,6 +1,9 @@
 ;; copyright (c) 2024, Andrew Leverette, all rights reserved
 
 (ns clojulator.calculator.core
+  "Core namespace for calculator API
+  
+  Provides a single function, `calculate`, to handle calculation logic."
   (:require
    [clojulator.calculator.evaluator :as ev]
    [clojulator.calculator.parser :as p]

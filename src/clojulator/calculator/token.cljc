@@ -1,21 +1,26 @@
 ;; copyright (c) 2024, Andrew Leverette, all rights reserved
 
-(ns clojulator.calculator.token)
+(ns clojulator.calculator.token
+  "Token namespace for defining and representing tokens.
+  
+  Provdides several functions for constructing tokens various types.")
 
 ;; Symbols that can be turned into tokens
 ;; Most symbols are represented as a single
 ;; character, but the history symbols are strings
-(def symbol-tokens {\(   :token/OpenParen
-                    \)   :token/CloseParen
-                    \+   :token/Plus
-                    \-   :token/Minus
-                    \*   :token/Star
-                    \/   :token/Slash
-                    \^   :token/Caret
-                    \%   :token/Modulo
-                    "p1" :token/*1
-                    "p2" :token/*2
-                    "p3" :token/*3})
+(def symbol-tokens
+  "Special symbols that can be turned into tokens"
+  {\(   :token/OpenParen
+   \)   :token/CloseParen
+   \+   :token/Plus
+   \-   :token/Minus
+   \*   :token/Star
+   \/   :token/Slash
+   \^   :token/Caret
+   \%   :token/Modulo
+   "p1" :token/*1
+   "p2" :token/*2
+   "p3" :token/*3})
 
 (defn token
   "Token constructor"

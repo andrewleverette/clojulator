@@ -1,6 +1,9 @@
 ;; copyright (c) 2024, Andrew Leverette, all rights reserved
 
-(ns clojulator.utils.printer)
+(ns clojulator.utils.printer
+  "Printer namespace for printing messages to the console.
+  
+  Provides a public functions to handle printing to a generic output.")
 
 (defn- stdout-printer
   [message & {:keys [with-newline? with-flush?]
