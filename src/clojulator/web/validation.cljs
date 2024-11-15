@@ -6,6 +6,9 @@
   Provides functionality to validate user input and determine
   the next valid input state.")
 
+(def ^:private supported-operators
+  #{"+" "-" "*" "/" "^" "%"})
+
 (defn- start-state [input]
   (cond
     (= input "(")   :validation/after-open-paren
@@ -15,7 +18,7 @@
 
 (defn- after-number-state [input display]
   (cond
-    (#{"+" "-" "*" "/" "^" "%"} input)                :validation/after-operator
+    (supported-operators input)                :validation/after-operator
     (= input ")")                                     :validation/after-close-paren
     (and (= input ".") (not (re-find #"\." display))) :validation/after-decimal
     (number? input)                                   :validation/after-number
@@ -23,7 +26,7 @@
 
 (defn- after-calculate-state [input]
   (cond
-    (#{"+" "-" "*" "/" "^" "%"} input) :validation/after-operator
+    (supported-operators input) :validation/after-operator
     (= input "(")                      :validation/after-open-paren
     (number? input)                    :validation/after-number
     :else                              :validation/invalid))
@@ -54,7 +57,7 @@
     :else                :validation/invalid))
 
 (defn- after-close-paren-state [input]
-  (if (#{"+" "-" "*" "/" "^" "%"} input)
+  (if (supported-operators input)
     :validation/after-operator
     :validation/invalid))
 
