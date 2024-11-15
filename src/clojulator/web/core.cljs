@@ -1,6 +1,7 @@
 ;; copyright (c) 2024, Andrew Leverette, all rights reserved
  
 (ns clojulator.web.core
+  "Core namespace for Clojulator web application"
   (:require
    [clojulator.calculator.core :as calc]
    [clojulator.web.validation :as v]
@@ -20,7 +21,7 @@
                                  :state/display ""
                                  :state/validation-state :validation/start
                                  :state/alert {:alert/message ""
-                                               :alert/visble false
+                                               :alert/visible false
                                                :alert/timeout-id nil}}))
 
 ;; Event Handlers
@@ -120,6 +121,7 @@
    [:p {:class "text-sm"} (:alert/message alert)]])
 
 (r-alias/defalias header
+  "Header component"
   []
   [:div.header
    {:class "text-center"}
@@ -127,6 +129,10 @@
    [:h4 "A calculator written in Clojure"]])
 
 (r-alias/defalias display
+  "Display component
+  
+  Shows the current input from the user and the result
+  of the last calculation"
   [{:state/keys [last-expression value display]}]
   [:div
    {:class ["w-full" "h-16" "sm:h-28" "bg-white" "border-2" "border-blue-400" "rounded-lg" "mt-5" "md:mt-0" "flex" "flex-col" "justify-evenly" "items-end" "pr-2" "border-blue-500" "text-right"]}
@@ -142,6 +148,9 @@
      :class ["text-2xl" "md:text-3xl" "font-semibold"]} display]])
 
 (r-alias/defalias symbol-keys
+  "Symbol keys component
+  
+  Renders all the operator keys"
   []
   (let [operators ["-" "+" "/" "*" "%" "^" "(" ")"]]
     [:div
@@ -152,6 +161,9 @@
                             :on {:click [:display/update %]}} %) operators)]))
 
 (r-alias/defalias numeric-keys
+  "Numeric keys component
+  
+  Renders the the history, numeric, equals keys"
   [{:state/keys [history]}]
   (let [numbers [7 8 9 4 5 6 1 2 3 0 "."]]
     [:div
@@ -169,6 +181,9 @@
                :on {:click [:api/calculate]}} "="]]))
 
 (r-alias/defalias keypad
+  "The keypad component
+  
+  Renders the numeric and symbol keys"
   [data]
   [:div
    {:class ["bg-white" "text-xl" "w-full" "p-1" "rounded-lg" "grid" "grid-cols-12"]}
@@ -176,6 +191,9 @@
    [symbol-keys]])
 
 (r-alias/defalias calculator
+  "The calculator component
+  
+  Renders the calculator display and keypad"
   [data]
   [:div
    {:class ["flex" "flex-col" "items-center" "gap-3" "font-bold"]}
@@ -185,6 +203,7 @@
 ;; Views
 
 (defn index
+  "Root view of the Clojulator web application"
   [data]
   [:div
    {:class ["bg-slate-400" "flex" "flex-col" "items-center" "min-h-screen"]}

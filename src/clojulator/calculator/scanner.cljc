@@ -1,6 +1,11 @@
 ;; copyright (c) 2024, Andrew Leverette, all rights reserved
 
 (ns clojulator.calculator.scanner
+  "Scanner namespace for converting a string into a sequence of tokens.
+  
+  Provides a single public function, `tokenize`, to handle converting
+  a string into a sequence of tokens. Other private functions in this namespace
+  define the rules for converting a character sequence into a token."
   (:require [clojulator.calculator.token :as tok]))
 
 (defn- is-repl-symbol?

@@ -1,6 +1,11 @@
 ;; copyright (c) 2024, Andrew Leverette, all rights reserved
 
-(ns clojulator.calculator.parser)
+(ns clojulator.calculator.parser
+  "Parser namespace for parsing tokens into an AST.
+  
+  Provides a single public function, `parse`, to handle converting
+  a sequence of tokens into an AST. The other privat functions in this namespace
+  define the grammar rules.")
 
 (declare expression)
 
@@ -120,5 +125,7 @@
       (parser-error (:remaining tree)))))
 
 (defn parse
+  "Given a sequence of tokens, returns the root node of the AST.
+  Throws a syntax error if the input is invalid."
   [tokens]
   (ast tokens))
