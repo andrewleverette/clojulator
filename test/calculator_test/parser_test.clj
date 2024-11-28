@@ -15,7 +15,11 @@
   (testing "a unary minus should return a minus number node"
     (is (= [:node/Minus [:node/Number 1.0]] (parse (tokenize "-1")))))
   (testing "a minus minus should return a minus minus number node"
-    (is (= [:node/Minus [:node/Minus [:node/Number 1.0]]] (parse (tokenize "--1"))))))
+    (is (= [:node/Minus [:node/Minus [:node/Number 1.0]]] (parse (tokenize "--1")))))
+  (testing "numbers written in scientific notation should return a number node"
+    (is (= [:node/Number 1.0] (parse (tokenize "1e0"))))
+    (is (= [:node/Number 10.0] (parse (tokenize "1e1"))))
+    (is (= [:node/Number 0.1] (parse (tokenize "1e-1"))))))
 
 (deftest environment-variable-tests
   (testing "valid environment variables should return a single node in AST"
