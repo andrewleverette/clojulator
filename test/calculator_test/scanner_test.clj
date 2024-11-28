@@ -19,7 +19,14 @@
   (testing "fractional numbers should return valid tokens"
     (is (= [(number->token "1.0" 0)] (tokenize "1.0")))
     (is (= [(number->token "2.25" 0)] (tokenize "2.25")))
-    (is (= [(number->token "0.125" 0)] (tokenize "0.125")))))
+    (is (= [(number->token "0.125" 0)] (tokenize "0.125"))))
+  (testing "numbers with exponentials should return valid tokens"
+    (is (= [(number->token "1E10" 0)] (tokenize "1E10")))
+    (is (= [(number->token "1.5E10" 0)] (tokenize "1.5e10")))
+    (is (= [(number->token "1E+10" 0)] (tokenize "1E+10")))
+    (is (= [(number->token "1E-10" 0)] (tokenize "1E-10")))
+    (is (= [(number->token "1.5E+10" 0)] (tokenize "1.5e+10")))
+    (is (= [(number->token "1.5E-10" 0)] (tokenize "1.5e-10")))))
 
 (deftest supported-symbol-tests
   (testing "All supported symbols"

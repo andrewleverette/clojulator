@@ -6,7 +6,8 @@
   (testing "evaluating a number should return the number"
     (is (= 1.0 (evaluate [:node/Number 1.0] [])))
     (is (= 10.0 (evaluate [:node/Number 10.0] [])))
-    (is (= 1234567890.0 (evaluate [:node/Number 1234567890.0] []))))
+    (is (= 1234567890.0 (evaluate [:node/Number 1234567890.0] [])))
+    (is (= 1.0E10 (evaluate [:node/Number 1e10] []))))
   (testing "evaluating a number that is nil should return nil"
     (is (nil? (evaluate [:node/Number nil] [])))))
 

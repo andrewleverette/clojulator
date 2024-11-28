@@ -42,14 +42,29 @@
   (when (= \. (first chars))
     (integer-lexeme (rest chars))))
 
+(defn- exponential-lexeme
+  [chars]
+  (when (->> chars first #{\e \E})
+    (let [remaining (rest chars)
+          sign (->> remaining first #{\- \+})
+          digits (integer-lexeme (if sign (rest remaining) remaining))]
+      (cond-> "E"
+        sign (str sign)
+        true (str digits)))))
+
 (defn- number-lexeme
   [chars]
   (let [int-part (integer-lexeme chars)
         int-length (count int-part)
-        fractional-part (->> chars (drop int-length) fractional-lexeme)]
-    (if (empty? fractional-part)
-      int-part
-      (str int-part "." fractional-part))))
+        fractional-part (->> chars (drop int-length) fractional-lexeme)
+        fractional-length (count fractional-part)
+        exp-part (->> chars
+                      (drop (+ int-length
+                               (if (zero? fractional-length) 0 (inc fractional-length))))
+                      exponential-lexeme)]
+    (cond-> int-part
+      fractional-part (str "." fractional-part)
+      exp-part (str exp-part))))
 
 (defn- repl-lexeme
   [chars]
