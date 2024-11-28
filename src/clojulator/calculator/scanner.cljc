@@ -48,7 +48,7 @@
     (let [remaining (rest chars)
           sign (->> remaining first #{\- \+})
           digits (integer-lexeme (if sign (rest remaining) remaining))]
-      (cond-> ""
+      (cond-> "E"
         sign (str sign)
         true (str digits)))))
 
@@ -64,7 +64,7 @@
                       exponential-lexeme)]
     (cond-> int-part
       fractional-part (str "." fractional-part)
-      exp-part (str "E" exp-part))))
+      exp-part (str exp-part))))
 
 (defn- repl-lexeme
   [chars]
