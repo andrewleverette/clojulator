@@ -1,5 +1,7 @@
 .clj-kondo
-.cpache
+.cpcache/
+.nrepl-port
+.rebel_readline_history
 .lsp
 .calva
 .shadow-cljs
